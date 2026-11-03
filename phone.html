@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Main page on a phone | Animation site wireframe</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+body{margin:0}
+a{color:inherit}
+.root{--bg:#FFFFFF;--ink:#26221E;--mute:#5F5A53;--line:#CFCAC3;--ph:#E6E2DC;--phink:#3A352F;--a1:#E6E2DC;--b1:#B9B3AA;--a2:#B9B3AA;--b2:#F1EEE9;--a3:#6F6A63;--b3:#E6E2DC;--a4:#F1EEE9;--b4:#6F6A63;background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;font-size:16px;line-height:1.5}
+.root.color{--bg:#F3E9DA;--ink:#291F18;--mute:#5C4A3C;--line:#BFAE98;--ph:#291F18;--phink:#F3E9DA;--a1:#BA6441;--b1:#F3E9DA;--a2:#291F18;--b2:#BA6441;--a3:#F3E9DA;--b3:#291F18;--a4:#BB6C2A;--b4:#291F18}
+.root.dark{--bg:#1E1D1C;--ink:#F1EFEB;--mute:#B4B0AA;--line:#4A4845;--ph:#2B2A28;--phink:#E4E1DC;--a1:#2B2A28;--b1:#6B6864;--a2:#1E1D1C;--b2:#8D8983;--a3:#F1EFEB;--b3:#1E1D1C;--a4:#3A3836;--b4:#1E1D1C;color-scheme:dark}
+.root.dark .p3{background:#2B2A28;--s:#C4C0BA}.root.dark .pt{background:#1E1D1C!important;color:#F1EFEB!important}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:97.5px}
+.t{position:relative;overflow:hidden}.t::before{content:"";position:absolute}
+.p1{background:var(--a1);--s:var(--b1)}.p2{background:var(--a2);--s:var(--b2)}.p3{background:var(--a3);--s:var(--b3)}.p4{background:var(--a4);--s:var(--b4)}
+.disc::before{inset:15%;border-radius:50%;background:var(--s)}
+.arch::before{left:14%;right:14%;top:14%;bottom:0;border-radius:999px 999px 0 0;background:var(--s)}
+.cap::before{left:12%;right:12%;top:31%;bottom:31%;border-radius:999px;background:var(--s)}
+.q2::before{inset:0;border-radius:0 0 0 100%;background:var(--s)}
+.stri::before{inset:0;background:repeating-linear-gradient(0deg,var(--s) 0 12.5%,transparent 12.5% 25%)}
+.ph{background:var(--ph);color:var(--phink);display:flex;flex-direction:column;justify-content:flex-end;padding:14px 16px;box-sizing:border-box;border:1px solid var(--bg);grid-column:span 4;grid-row:span 2;text-decoration:none;min-width:0}
+.logo{display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;font-weight:500;padding:6px;box-sizing:border-box;border:1px solid var(--line);margin:-.5px}
+.sec{padding:32px 16px 16px}
+h2{font-size:24px;line-height:1.1;margin:0;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+.door{display:flex;gap:16px;align-items:center;padding:14px 16px;min-height:96px;box-sizing:border-box;text-decoration:none;border-top:1px solid var(--line)}
+input[type=text],input[type=email]{width:100%;box-sizing:border-box;min-height:48px;padding:0 14px;border:1px solid var(--mute);background:transparent;color:var(--ink);font:inherit;border-radius:4px}
+.btn{min-height:48px;padding:0 28px;border:0;border-radius:99px;background:var(--a3);color:var(--b3);font:inherit;font-weight:700;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer}
+.check{display:flex;align-items:center;gap:10px;min-height:44px}.check input{width:20px;height:20px}
+</style>
+
+<style>
+html{background:#111}
+.review{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;padding:10px 16px;background:#111;color:#F1EFEB;font:14px/1.4 "DM Sans",system-ui,sans-serif}
+.review strong{margin-right:8px}.review a{color:#C4C0BA;min-height:28px;display:inline-flex;align-items:center}.review a[aria-current]{color:#fff;font-weight:700}
+</style><style>.frame{width:390px;max-width:100%;margin:24px auto}</style>
+</head>
+<body>
+<nav class="review" aria-label="Wireframe pages"><strong>Animation site wireframe</strong><a href="index.html">Main page</a><a href="specialty.html">Specialty page template</a><a href="phone.html" aria-current=page>Main page on a phone</a></nav>
+<div class="frame">
+<div class="root dark" style="width: 390px">
+  <header style="display: flex; justify-content: space-between; align-items: center; min-height: 72px; padding: 0 16px">
+    <a href="#top" aria-label="Amigo home" style="display: block; width: 44px; height: 44px"><span class="t p3 disc" style="display: block; width: 44px; height: 44px; border-radius: 50%"></span></a>
+    <button type="button" aria-label="Open menu" style="width: 44px; height: 44px; border: 1px solid var(--line); background: transparent; border-radius: 50%; color: var(--ink)"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M0 1h18M0 6h18M0 11h18" stroke="currentColor" stroke-width="2"></path></svg></button>
+  </header>
+  <div class="g4">
+    <div class="ph" style="justify-content: center; align-items: center; text-align: center"><strong>Reel plays muted</strong><span>UI animation up front</span></div>
+    <div class="pt" style="grid-column: span 4; background: var(--a3); color: var(--b3); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 50px; letter-spacing: .02em">ANIMATION</div>
+    <div class="t p1 disc"></div><div class="t p4 arch"></div><div class="t p2 q2"></div><div class="t p3 cap"></div>
+  </div>
+  <section style="padding: 32px 16px; display: flex; flex-direction: column; gap: 12px">
+    <h1 style="margin: 0; font-size: 30px; line-height: 1.1">[One line: what you make and who it is for]</h1>
+    <p style="margin: 0; color: var(--mute)">[Two sentences of positioning.]</p>
+    <a class="btn" href="#start">Start a project</a>
+  </section>
+  <div class="sec"><h2>Who we have worked with</h2></div>
+  <div class="g4"><div class="logo">Jeep</div><div class="logo">Harley-Davidson</div><div class="logo">NASA</div><div class="logo">Adobe</div><div class="logo">HP</div><div class="logo">The General</div><div class="logo">Reef</div><div class="logo">Skatelite</div><div class="logo">San Diego Airport</div><div class="logo">Google</div><div class="logo">Toyota</div><div class="logo">YETI</div><div class="logo">Apple</div><div class="logo">Coca-Cola</div><div class="logo">Patagonia</div><div class="logo">Rivian</div><div class="logo">Sonos</div><div class="logo">Microsoft</div></div>
+  <div class="sec"><h2>Selected work</h2></div>
+  <div class="g4">
+    <a class="ph" href="#work"><strong>[Piece]</strong><span>[Credit]</span></a>
+    <a class="ph" href="#work"><strong>[Piece]</strong><span>[Credit]</span></a>
+    <a class="ph" href="#work"><strong>[Piece]</strong><span>[Credit]</span></a>
+    <a class="ph" href="#work"><strong>[Piece]</strong><span>[Credit]</span></a>
+    <a class="ph" href="#work"><strong>[Piece]</strong><span>[Credit]</span></a>
+  </div>
+  <div class="sec"><h2>What we make</h2></div>
+  <a class="door" href="#d1"><span class="t p1 arch" style="display: block; width: 64px; height: 64px; flex: none"></span><span><strong>Commercials</strong><br>[One line]</span></a>
+  <a class="door" href="#d2"><span class="t p2 cap" style="display: block; width: 64px; height: 64px; flex: none"></span><span><strong>UI and explainers</strong><br>[One line]</span></a>
+  <a class="door" href="#d3"><span class="t p3 disc" style="display: block; width: 64px; height: 64px; flex: none"></span><span><strong>3D</strong><br>[One line]</span></a>
+  <a class="door" href="#d4"><span class="t p4 stri" style="display: block; width: 64px; height: 64px; flex: none"></span><span><strong>Packages</strong><br>[One line]</span></a>
+  <section style="padding: 32px 16px; display: flex; flex-direction: column; gap: 12px; border-top: 1px solid var(--line)">
+    <h2>Our team</h2>
+    <p style="margin: 0; color: var(--mute)">[Short note on the team.]</p>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+      <div class="ph" style="height: 190px; grid-column: auto; grid-row: auto"><strong>Austin Faure</strong><span>[Role]</span></div>
+      <div class="ph" style="height: 190px; grid-column: auto; grid-row: auto"><strong>James Prola</strong><span>[Role]</span></div>
+      <div class="ph" style="height: 190px; grid-column: auto; grid-row: auto"><strong>Brandon Munson</strong><span>[Role]</span></div>
+      <div class="ph" style="height: 190px; grid-column: auto; grid-row: auto"><strong>Ashley Munson</strong><span>[Role]</span></div>
+    </div>
+  </section>
+  <form id="start" style="padding: 32px 16px; display: flex; flex-direction: column; gap: 12px">
+    <h2>Start a project</h2>
+    <div><label for="pfn" style="font-weight: 500">Full name</label><input id="pfn" type="text"></div>
+    <div><label for="pem" style="font-weight: 500">Email</label><input id="pem" type="email"></div>
+    <fieldset style="border: 0; padding: 0; margin: 0"><legend style="font-weight: 500; padding: 0">What do you need?</legend>
+      <label class="check" for="pn1"><input id="pn1" type="checkbox">Commercial</label>
+      <label class="check" for="pn2"><input id="pn2" type="checkbox">UI or explainer</label>
+      <label class="check" for="pn3"><input id="pn3" type="checkbox">3D</label>
+      <label class="check" for="pn4"><input id="pn4" type="checkbox">Package</label>
+    </fieldset>
+    <button class="btn" type="button">Send</button>
+  </form>
+  <footer style="padding: 20px 16px; border-top: 1px solid var(--line)">Amigo Productions, Oceanside CA</footer>
+</div>
+</div>
+</body>
+</html>
