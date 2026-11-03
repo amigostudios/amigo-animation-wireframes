@@ -20,11 +20,11 @@ function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t
 const DG=[['#1E1D1C','#4A4845'],['#2B2A28','#6B6864'],['#1E1D1C','#8D8983'],['#3A3836','#1E1D1C'],['#2B2A28','#C4C0BA'],['#1E1D1C','#34322F'],['#242322','#8D8983']];
 const AM=[['#BA6441','#F3E9DA'],['#291F18','#BA6441'],['#F3E9DA','#291F18'],['#BB6C2A','#291F18'],['#8E4427','#F3E9DA'],['#291F18','#F3E9DA']];
 const RP={disc:[.14,.14,.72,.72,.36,.36,.36,.36],arch:[.14,.14,.72,.86,.36,.36,0,0],cap:[.1,.3,.8,.4,.2,.2,.2,.2],q1:[0,0,1,1,0,0,1,0],q2:[0,0,1,1,0,0,0,1],q3:[0,0,1,1,1,0,0,0],q4:[0,0,1,1,0,1,0,0],h1:[0,.5,1,.5,.5,.5,0,0],h3:[0,0,1,.5,0,0,.5,.5]};
-const ROUND=Object.keys(RP),KINDS=['disc','arch','cap','q1','stri','q3','zig','dn','h1','q2','ar','q4','stri','h3','disc','zig','mk','cap','q1','ar','dn','arch','q3','stri','h1','disc','zig','q4','cap','q2'];
+const ROUND=Object.keys(RP),KINDS=['disc','arch','cap','q1','stri','q3','zig','dn','h1','q2','ar','q4','stri','wave','disc','zig','mk','cap','q1','ar','dn','arch','q3','stri','h1','disc','wave','q4','cap','q2'];
 const c=document.getElementById('c'),g=c.getContext('2d'),still=matchMedia('(prefers-reduced-motion: reduce)').matches,touchy=matchMedia('(hover: none)').matches;
 let acc=0,C=12,R=7,S=100,W=0,H=0,tiles=[],hoverT=null,cx=-999,cy=-999,lastDir=[1,0],px=-999,py=-999,dirty=true,now=0,last=0;
 function layout(){const d=Math.min(2,devicePixelRatio||1),w=innerWidth,h=innerHeight,cell=Math.max(72,Math.min(180,w/12));W=Math.round(w*d);H=Math.round(h*d);c.width=W;c.height=H;S=cell*d;C=Math.ceil(W/S);R=Math.ceil(H/S);
-  const r=rng(11),at={};let n=0;tiles=[];for(let j=0;j<R;j++)for(let i=0;i<C;i++){const kind=KINDS[Math.floor(r()*KINDS.length)];n++;let gp,ap,tr=0;do{gp=DG[Math.floor(r()*DG.length)]}while(tr++<30&&(at[(i-1)+','+j]?.g===gp||at[i+','+(j-1)]?.g===gp));tr=0;do{ap=AM[Math.floor(r()*AM.length)]}while(tr++<30&&(at[(i-1)+','+j]?.a===ap||at[i+','+(j-1)]?.a===ap));const alt=ROUND[Math.floor(r()*ROUND.length)];const t={i,j,kind,alt:alt===kind?'disc':alt,g:gp,a:ap,H:0,w:0,wAt:0,dl:0,m:0,mv:0,c:0};at[i+','+j]=t;tiles.push(t)}
+  const r=rng(11),at={};let n=0;tiles=[];for(let j=0;j<R;j++)for(let i=0;i<C;i++){const kind=KINDS[Math.floor(r()*KINDS.length)];n++;let gp,ap,tr=0;do{gp=DG[Math.floor(r()*DG.length)]}while(tr++<30&&(at[(i-1)+','+j]?.g===gp||at[i+','+(j-1)]?.g===gp));tr=0;do{ap=AM[Math.floor(r()*AM.length)]}while(tr++<30&&(at[(i-1)+','+j]?.a===ap||at[i+','+(j-1)]?.a===ap));if(kind==='wave'){gp=['#2B2A28','#C4C0BA'];ap=['#143F4E','#F3E9DA']}const alt=ROUND[Math.floor(r()*ROUND.length)];const t={i,j,kind,alt:alt===kind?'disc':alt,g:gp,a:ap,H:0,w:0,wAt:0,dl:0,m:0,mv:0,c:0};at[i+','+j]=t;tiles.push(t)}
   hoverT=null;dirty=true}
 function rr(p,x,y,s){g.beginPath();g.roundRect(x+p[0]*s,y+p[1]*s,p[2]*s,p[3]*s,[p[4]*s,p[5]*s,p[6]*s,p[7]*s])}
 function shape(k,x,y,s,bg,fg,hole){g.fillStyle=bg;g.fillRect(x-.5,y-.5,s+1,s+1);g.fillStyle=fg;if(RP[k]){rr(RP[k],x,y,s);g.fill();return}
@@ -33,6 +33,9 @@ function shape(k,x,y,s,bg,fg,hole){g.fillStyle=bg;g.fillRect(x-.5,y-.5,s+1,s+1);
   else if(k==='dn'){g.beginPath();g.arc(x+s/2,y+s/2,s*.38,0,Math.PI*2);g.closePath();g.moveTo(x+s/2+s*.15,y+s/2);g.arc(x+s/2,y+s/2,s*.15,0,Math.PI*2,true);g.closePath();g.fill('evenodd')}
   else if(k==='ar'){rr(RP.arch,x,y,s);g.fill();g.fillStyle=hole||bg;g.beginPath();g.roundRect(x+s*.32,y+s*.34,s*.36,s*.67,[s*.18,s*.18,0,0]);g.fill()}
   else if(k==='mk'){const q=s*.82/104;g.save();g.translate(x+s/2,y+s/2);g.scale(q,q);g.translate(-53,-50);g.fill(MARK[0]);g.fill(MARK[1]);g.restore()}}
+// wave tile: a low lump at rest that stands up and breaks on touch
+const LUMP=[[0,.9,.1,.8,.2,.72],[.3,.64,.4,.58,.5,.58],[.58,.58,.66,.6,.72,.66],[.74,.68,.76,.7,.78,.72],[.8,.74,.83,.76,.86,.78],[.88,.8,.9,.81,.93,.82],[.95,.83,.98,.85,1,.86]],BREAK=[[0,.86,.08,.74,.18,.62],[.3,.46,.42,.16,.58,.14],[.76,.12,.92,.26,.93,.46],[.88,.4,.82,.34,.74,.36],[.62,.38,.5,.48,.52,.62],[.54,.76,.62,.84,.72,.84],[.82,.84,.92,.82,1,.78]];
+function wave(x,y,s,m){g.beginPath();g.moveTo(x,y+s);for(let n=0;n<7;n++){const a=LUMP[n],b=BREAK[n],p=a.map((v,q)=>v+(b[q]-v)*m);g.bezierCurveTo(x+p[0]*s,y+Math.min(1,p[1])*s,x+p[2]*s,y+Math.min(1,p[3])*s,x+p[4]*s,y+Math.min(1,p[5])*s)}g.lineTo(x+s,y+s);g.closePath();g.fill()}
 const hx=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),cache={};
 const mix=(a,b,t)=>{if(t<=0)return a;if(t>=1)return b;const A=cache[a]||(cache[a]=hx(a)),B=cache[b]||(cache[b]=hx(b));return `rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join()})`};
 const strength=d=>d===0?1:d<=1.01?.8:.55;
@@ -50,7 +53,8 @@ function frame(time){requestAnimationFrame(frame);now=time;acc+=Math.min(100,tim
   if(!dirty)return;dirty=false;
   g.fillStyle='#1E1D1C';g.fillRect(0,0,W,H);
   for(const t of tiles){const x=t.i*S,y=t.j*S,b=mix(t.g[0],t.a[0],t.c),f=mix(t.g[1],t.a[1],t.c);g.save();g.beginPath();g.rect(x,y,S,S);g.clip();g.fillStyle=b;g.fillRect(x,y,S,S);
-    if(RP[t.kind]){const A=RP[t.kind],B=RP[t.alt==='q1'||!RP[t.alt]?'disc':t.alt],p=A.map((v,q)=>Math.max(0,v+(B[q]-v)*t.m)),sq=Math.max(.7,1+t.mv*.9);g.fillStyle=f;g.translate(x+S/2,y+S/2);g.scale(1/sq,sq);g.translate(-x-S/2,-y-S/2);rr(p,x,y,S);g.fill()}
+    if(t.kind==='wave'){g.fillStyle=f;const sq=Math.max(.8,1+t.mv*.5);g.translate(x+S/2,y+S);g.scale(1/sq,sq);g.translate(-x-S/2,-y-S);wave(x,y,S,t.m)}
+    else if(RP[t.kind]){const A=RP[t.kind],B=RP[t.alt==='q1'||!RP[t.alt]?'disc':t.alt],p=A.map((v,q)=>Math.max(0,v+(B[q]-v)*t.m)),sq=Math.max(.7,1+t.mv*.9);g.fillStyle=f;g.translate(x+S/2,y+S/2);g.scale(1/sq,sq);g.translate(-x-S/2,-y-S/2);rr(p,x,y,S);g.fill()}
     else{const s=1-t.mv*.8;g.translate(x+S/2,y+S/2);g.scale(s,s);g.translate(-x-S/2,-y-S/2);shape(t.kind,x,y,S,'rgba(0,0,0,0)',f,b)}
     g.restore()}}
 function toP(e){const d=W/innerWidth,X=e.clientX*d,Y=e.clientY*d,dx=X-px,dy=Y-py;if(Math.hypot(dx,dy)>.5&&px>-900)lastDir=[dx,dy];px=X;py=Y;cx=X;cy=Y}
