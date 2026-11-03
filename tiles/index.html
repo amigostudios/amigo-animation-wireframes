@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>Tile slide</title>
+<title>Tile morph</title>
 <style>
 html,body{margin:0;height:100%;background:#1E1D1C;overflow:hidden}
 canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
 </style>
 </head>
 <body>
-<canvas id="c" role="img" aria-label="Interactive grid of dark grey shape tiles that slide to Amigo colors under the cursor"></canvas>
+<canvas id="c" role="img" aria-label="Interactive grid of dark grey shape tiles that morph into new shapes and Amigo colors under the cursor"></canvas>
 <script>
 const MARK=[new Path2D("M 48.941406 46.355469 C 49.628906 36.613281 47.664062 29.878906 49.207031 20.226562 C 49.863281 16.113281 57.125 16.105469 56.621094 21.113281 C 56.59375 29.839844 57.066406 37.328125 56.847656 45.871094 C 57 58.933594 53.65625 56.5625 67.542969 56.460938 C 71.457031 55.777344 74.859375 52.9375 74.964844 48.628906 C 75.042969 42.898438 74.960938 35.328125 75.609375 29.339844 C 78.789062 24.015625 81.609375 28.488281 81.761719 32.480469 C 81.261719 52.726562 83.546875 65.0625 58.4375 63.609375 C 56.078125 63.796875 57.183594 63.824219 56.699219 65.441406 C 56.992188 73.757812 56.816406 82.003906 56.957031 91.1875 C 56.558594 95.191406 56.683594 94.503906 53.332031 94.847656 C 52.890625 94.628906 48.910156 95.410156 49.167969 93.851562 C 46.761719 69.664062 55.144531 79.886719 32.65625 72.960938 C 32.441406 72.554688 32.507812 73.191406 32.40625 72.875 C 27.128906 71.75 25.332031 68.277344 24.753906 63.03125 C 24.632812 58.046875 22.796875 42.175781 25.214844 39.742188 C 37.367188 32.152344 24.996094 65.257812 34.707031 66.585938 C 38.179688 68.449219 42.847656 68.625 47.070312 68.832031 C 48.773438 69.097656 48.933594 68.699219 48.828125 67.246094 C 49.371094 60.644531 48.777344 53.066406 48.941406 46.355469 "),new Path2D("M 61.632812 51.039062 C 61.398438 50.71875 61.347656 50.378906 61.34375 49.929688 C 61.265625 40.59375 61.40625 30.863281 61.703125 21.214844 C 61.023438 8.894531 44.046875 10.328125 43.875 21.730469 C 44.136719 34.957031 43.890625 48.609375 44.085938 62.03125 C 44.144531 63.132812 43.984375 63.507812 42.652344 63.347656 C 40.597656 62.460938 35.671875 64.191406 35.757812 60.308594 C 33.777344 52.132812 41.011719 34.527344 28.191406 33.621094 C 20.371094 32.558594 17.707031 41.757812 19.042969 48.285156 C 19.320312 54.9375 18.171875 61.921875 21.109375 68.164062 C 23.511719 76.796875 34.410156 78.375 41.753906 80.316406 C 42.023438 80.339844 42.394531 80.582031 42.789062 80.566406 C 44.402344 80.859375 44.003906 81.421875 44.183594 82.894531 C 44.285156 86.226562 44.074219 89.316406 44.40625 93.03125 C 44.699219 94.03125 43.480469 94.570312 42.664062 94.585938 C -2.746094 93.785156 -4.453125 22.453125 34.40625 9.558594 C 107.597656 -16.574219 121.703125 85.023438 63.582031 94.214844 C 60.042969 95.007812 62.644531 73.714844 61.710938 70.765625 C 61.710938 68.949219 61.292969 68.484375 64.121094 68.3125 C 86.835938 67.953125 87.277344 48.972656 86.421875 30.933594 C 86.398438 23.449219 76.4375 18.425781 71.851562 25.410156 C 69.382812 30.800781 70.769531 38.640625 70.296875 44.492188 C 70.160156 51.699219 68.019531 51.320312 62.53125 51.277344 C 62.15625 51.273438 62.039062 51.105469 61.632812 51.039062 ")];
 function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -20,31 +20,37 @@ const AM=[['#BA6441','#F3E9DA'],['#291F18','#BA6441'],['#F3E9DA','#291F18'],['#B
 const RP={disc:[.14,.14,.72,.72,.36,.36,.36,.36],arch:[.14,.14,.72,.86,.36,.36,0,0],cap:[.1,.3,.8,.4,.2,.2,.2,.2],q1:[0,0,1,1,0,0,1,0],q2:[0,0,1,1,0,0,0,1],q3:[0,0,1,1,1,0,0,0],q4:[0,0,1,1,0,1,0,0],h1:[0,.5,1,.5,.5,.5,0,0],h3:[0,0,1,.5,0,0,.5,.5]};
 const ROUND=Object.keys(RP),KINDS=['disc','arch','cap','q1','stri','q3','zig','dn','h1','q2','ar','q4','stri','h3','disc','zig','mk','cap','q1','ar','dn','arch','q3','stri','h1','disc','zig','q4','cap','q2'];
 const c=document.getElementById('c'),g=c.getContext('2d'),still=matchMedia('(prefers-reduced-motion: reduce)').matches,touchy=matchMedia('(hover: none)').matches;
-let C=12,R=7,S=100,W=0,H=0,tiles=[],hoverT=null,cx=-999,cy=-999,lastDir=[1,0],px=-999,py=-999,dirty=true,now=0,last=0;
+let acc=0,C=12,R=7,S=100,W=0,H=0,tiles=[],hoverT=null,cx=-999,cy=-999,lastDir=[1,0],px=-999,py=-999,dirty=true,now=0,last=0;
 function layout(){const d=Math.min(2,devicePixelRatio||1),w=innerWidth,h=innerHeight,cell=Math.max(72,Math.min(180,w/12));W=Math.round(w*d);H=Math.round(h*d);c.width=W;c.height=H;S=cell*d;C=Math.ceil(W/S);R=Math.ceil(H/S);
-  const r=rng(11),at={};let n=0;tiles=[];for(let j=0;j<R;j++)for(let i=0;i<C;i++){const kind=KINDS[Math.floor(r()*KINDS.length)];n++;let gp,ap,tr=0;do{gp=DG[Math.floor(r()*DG.length)]}while(tr++<30&&(at[(i-1)+','+j]?.g===gp||at[i+','+(j-1)]?.g===gp));tr=0;do{ap=AM[Math.floor(r()*AM.length)]}while(tr++<30&&(at[(i-1)+','+j]?.a===ap||at[i+','+(j-1)]?.a===ap));const alt=ROUND[Math.floor(r()*ROUND.length)];const t={i,j,kind,alt:alt===kind?'disc':alt,g:gp,a:ap,H:0,w:0,wAt:0,dl:0,st:1,dx:0,dy:0,face:{k:kind,col:false},next:null};at[i+','+j]=t;tiles.push(t)}
+  const r=rng(11),at={};let n=0;tiles=[];for(let j=0;j<R;j++)for(let i=0;i<C;i++){const kind=KINDS[Math.floor(r()*KINDS.length)];n++;let gp,ap,tr=0;do{gp=DG[Math.floor(r()*DG.length)]}while(tr++<30&&(at[(i-1)+','+j]?.g===gp||at[i+','+(j-1)]?.g===gp));tr=0;do{ap=AM[Math.floor(r()*AM.length)]}while(tr++<30&&(at[(i-1)+','+j]?.a===ap||at[i+','+(j-1)]?.a===ap));const alt=ROUND[Math.floor(r()*ROUND.length)];const t={i,j,kind,alt:alt===kind?'disc':alt,g:gp,a:ap,H:0,w:0,wAt:0,dl:0,m:0,mv:0,c:0};at[i+','+j]=t;tiles.push(t)}
   hoverT=null;dirty=true}
 function rr(p,x,y,s){g.beginPath();g.roundRect(x+p[0]*s,y+p[1]*s,p[2]*s,p[3]*s,[p[4]*s,p[5]*s,p[6]*s,p[7]*s])}
-function shape(k,x,y,s,bg,fg){g.fillStyle=bg;g.fillRect(x-.5,y-.5,s+1,s+1);g.fillStyle=fg;if(RP[k]){rr(RP[k],x,y,s);g.fill();return}
+function shape(k,x,y,s,bg,fg,hole){g.fillStyle=bg;g.fillRect(x-.5,y-.5,s+1,s+1);g.fillStyle=fg;if(RP[k]){rr(RP[k],x,y,s);g.fill();return}
   if(k==='stri'){for(let a=0;a<4;a++)g.fillRect(x-.5,y+s*(a/4+.0625),s+1,s/8)}
   else if(k==='zig'){g.strokeStyle=fg;g.lineWidth=s*.045;g.lineJoin='round';for(let a=0;a<3;a++){g.beginPath();for(let q=0;q<=8;q++){const X=x-s*.05+s*1.1*q/8,Y=y+s*(.25+a*.25)+(q%2?-s*.06:s*.06);q?g.lineTo(X,Y):g.moveTo(X,Y)}g.stroke()}}
   else if(k==='dn'){g.beginPath();g.arc(x+s/2,y+s/2,s*.38,0,Math.PI*2);g.closePath();g.moveTo(x+s/2+s*.15,y+s/2);g.arc(x+s/2,y+s/2,s*.15,0,Math.PI*2,true);g.closePath();g.fill('evenodd')}
-  else if(k==='ar'){rr(RP.arch,x,y,s);g.fill();g.fillStyle=bg;g.beginPath();g.roundRect(x+s*.32,y+s*.34,s*.36,s*.67,[s*.18,s*.18,0,0]);g.fill()}
+  else if(k==='ar'){rr(RP.arch,x,y,s);g.fill();g.fillStyle=hole||bg;g.beginPath();g.roundRect(x+s*.32,y+s*.34,s*.36,s*.67,[s*.18,s*.18,0,0]);g.fill()}
   else if(k==='mk'){const q=s*.82/104;g.save();g.translate(x+s/2,y+s/2);g.scale(q,q);g.translate(-53,-50);g.fill(MARK[0]);g.fill(MARK[1]);g.restore()}}
-function swap(t,face){if(t.next)t.face=t.next;t.next=face;t.st=still?1:0;if(still){t.face=face;t.next=null}if(Math.abs(lastDir[0])>=Math.abs(lastDir[1])){t.dx=lastDir[0]>=0?1:-1;t.dy=0}else{t.dx=0;t.dy=lastDir[1]>=0?1:-1}}
+const hx=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),cache={};
+const mix=(a,b,t)=>{if(t<=0)return a;if(t>=1)return b;const A=cache[a]||(cache[a]=hx(a)),B=cache[b]||(cache[b]=hx(b));return `rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join()})`};
 const strength=d=>d===0?1:d<=1.01?.8:.55;
 function hold(t,X,Y){const u=X/S,v=Y/S,p=.14;return u>=t.i-p&&u<t.i+1+p&&v>=t.j-p&&v<t.j+1+p}
-function frame(time){requestAnimationFrame(frame);now=time;const dt=Math.min(100,time-last||16);last=time;
+function frame(time){requestAnimationFrame(frame);now=time;acc+=Math.min(100,time-last||16);last=time;
   let nt=null;if(cx>-900){if(hoverT&&hold(hoverT,cx,cy))nt=hoverT;else{const i=Math.floor(cx/S),j=Math.floor(cy/S);nt=tiles.find(q=>q.i===i&&q.j===j)||null}}
   hoverT=nt;
   for(const t of tiles){let w=0,d=0;if(nt){d=Math.hypot(t.i-nt.i,t.j-nt.j);if(d<=1.5001)w=strength(d)}
     if(w!==t.w){t.w=w;t.wAt=now+(w>0?d*55:(t.dl||0)*30);if(w>0)t.dl=d}
-    if(now>=t.wAt&&(t.H>0)!==(t.w>0)){const on=t.w>0;t.H=t.w;swap(t,on?{k:t.alt,col:true}:{k:t.kind,col:false});dirty=true}
-    if(t.next){t.st=Math.min(1,t.st+dt/300);dirty=true;if(t.st>=1){t.face=t.next;t.next=null}}}
+    if(now>=t.wAt&&t.H!==t.w){t.H=t.w;dirty=true}}
+  let n=0;while(acc>=16.67&&n<5){for(const t of tiles){if(still){if(t.m!==t.H||t.c!==t.H){t.m=t.c=t.H;t.mv=0;dirty=true}continue}
+      if(Math.abs(t.mv)<.0006&&Math.abs(t.H-t.m)<.0006&&Math.abs(t.H-t.c)<.002){if(t.m!==t.H||t.c!==t.H||t.mv){t.m=t.c=t.H;t.mv=0;dirty=true}continue}
+      t.mv+=(t.H-t.m)*.14;t.mv*=.7;t.m+=t.mv;t.c+=(t.H-t.c)*(t.H>t.c?.22:.05);dirty=true}acc-=16.67;n++}
+  if(n===5)acc=0;
   if(!dirty)return;dirty=false;
   g.fillStyle='#1E1D1C';g.fillRect(0,0,W,H);
-  for(const t of tiles){const x=t.i*S,y=t.j*S;g.save();g.beginPath();g.rect(x,y,S,S);g.clip();const pair=f=>f.col?t.a:t.g,e=t.st<1?1-Math.pow(1-t.st,3):1,A=pair(t.face);
-    if(t.next){const N=pair(t.next);shape(t.face.k,x+t.dx*e*S,y+t.dy*e*S,S,A[0],A[1]);shape(t.next.k,x+t.dx*(e-1)*S,y+t.dy*(e-1)*S,S,N[0],N[1]);dirty=true}else shape(t.face.k,x,y,S,A[0],A[1]);g.restore()}}
+  for(const t of tiles){const x=t.i*S,y=t.j*S,b=mix(t.g[0],t.a[0],t.c),f=mix(t.g[1],t.a[1],t.c);g.save();g.beginPath();g.rect(x,y,S,S);g.clip();g.fillStyle=b;g.fillRect(x,y,S,S);
+    if(RP[t.kind]){const A=RP[t.kind],B=RP[t.alt==='q1'||!RP[t.alt]?'disc':t.alt],p=A.map((v,q)=>Math.max(0,v+(B[q]-v)*t.m)),sq=Math.max(.7,1+t.mv*.9);g.fillStyle=f;g.translate(x+S/2,y+S/2);g.scale(1/sq,sq);g.translate(-x-S/2,-y-S/2);rr(p,x,y,S);g.fill()}
+    else{const s=1-t.mv*.8;g.translate(x+S/2,y+S/2);g.scale(s,s);g.translate(-x-S/2,-y-S/2);shape(t.kind,x,y,S,'rgba(0,0,0,0)',f,b)}
+    g.restore()}}
 function toP(e){const d=W/innerWidth,X=e.clientX*d,Y=e.clientY*d,dx=X-px,dy=Y-py;if(Math.hypot(dx,dy)>.5&&px>-900)lastDir=[dx,dy];px=X;py=Y;cx=X;cy=Y}
 function off(){cx=cy=-999;px=py=-999}
 c.addEventListener('pointermove',toP);c.addEventListener('pointerdown',toP);c.addEventListener('pointerleave',off);c.addEventListener('pointercancel',off);if(touchy)c.addEventListener('pointerup',()=>setTimeout(off,500));
