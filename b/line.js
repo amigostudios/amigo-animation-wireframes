@@ -32,9 +32,36 @@ function icon(key, S) {
   let g = '';
   if (key === 'commercials') g = `<path class="s ln b1" pathLength="1" d="${P('M8 25V16H17')}"/><path class="s ln b2" pathLength="1" style="--d:.1s" d="${P('M47 16H56V25')}"/><path class="s ln b3" pathLength="1" style="--d:.2s" d="${P('M8 39V48H17')}"/><path class="s ln b4" pathLength="1" style="--d:.3s" d="${P('M47 48H56V39')}"/><circle class="lt pop" cx="${n(39)}" cy="${n(29)}" r="${Math.max(3.4, n(3.2))}"/>`;
   else if (key === 'ui') g = `<rect class="s ln" pathLength="1" x="${n(8)}" y="${n(21)}" width="${n(48)}" height="${n(22)}" rx="${n(11)}"/><circle class="f knob mv" style="--kx:${n(26)}px" cx="${n(19)}" cy="${n(32)}" r="${n(5.5)}"/>`;
-  else if (key === '3d') g = `<circle class="s ln" pathLength="1" cx="${n(32)}" cy="${n(32)}" r="${n(22)}"/><ellipse class="s eq" cx="${n(32)}" cy="${n(32)}" rx="${n(22)}" ry="${n(8)}"/>`;
+  else if (key === '3d') {
+    // 11-26: a wireframe cube that turns a quarter, holds, turns again (loops seamlessly; SMIL so it needs no script per frame)
+    const V = [-1, 1].flatMap(x => [-1, 1].flatMap(y => [-1, 1].map(z => [x, y, z]))), E = [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]];
+    const tl = -.5, h = 12.5, cube = th => { const P = V.map(([x, y, z]) => { const X = x * Math.cos(th) + z * Math.sin(th), Z = -x * Math.sin(th) + z * Math.cos(th), Y = y * Math.cos(tl) - Z * Math.sin(tl); return [n(32 + X * h), n(33 + Y * h)] }); return E.map(([a, b]) => `M${P[a][0]} ${P[a][1]}L${P[b][0]} ${P[b][1]}`).join('') };
+    const ease = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2, fr = []; for (let i = 0; i <= 30; i++) { const u = i / 30, m = u < .55 ? ease(u / .55) : 1; fr.push(cube(Math.PI / 6 + m * Math.PI / 2)) }
+    g = `<path class="s ln cube" pathLength="1" d="${fr[0]}">${RM ? '' : `<animate attributeName="d" dur="3.6s" repeatCount="indefinite" values="${fr.join(';')}"/>`}</path>`;
+  }
   else g = `<path class="s dim ln" pathLength="1" d="${P('M5 32H59')}"/><path class="f tw k1" d="${P('M14 25.5L20.5 32L14 38.5L7.5 32Z')}"/><path class="f tw k2" d="${P('M26.5 26H37.5L26.5 38H37.5Z')}"/><path class="f tw k3" d="${P('M44.5 26.5H55.5V37.5H44.5Z')}"/>`;
   return `<svg class="art ic" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" aria-hidden="true">${g}</svg>`;
+}
+// the Amigo badge (rebuilt as vector from the studio's round stamp) for the footer
+function badge(S) {
+  const ring = r => `M${100 - r} 100a${r} ${r} 0 1 1 ${2 * r} 0a${r} ${r} 0 1 1 ${-2 * r} 0`;
+  return `<svg class="bdg" width="${S}" height="${S}" viewBox="0 0 200 200" role="img" aria-label="Amigo Productions, Creative Studios, 825 South Coast Hwy, Oceanside, California"><defs><path id="bo" d="${ring(79)}"/><path id="bi" d="${ring(53.5)}"/></defs>
+    <g fill="none" stroke="currentColor"><circle cx="100" cy="100" r="96" stroke-width="3"/><circle cx="100" cy="100" r="66" stroke-width="2.4"/><circle cx="100" cy="100" r="44" stroke-width="2.4"/><path d="M100 57L143 100L100 143L57 100ZM57 100H143" stroke-width="2.4" stroke-linejoin="round"/></g>
+    <g fill="currentColor" font-family="Oaxaca, sans-serif"><text font-size="17" letter-spacing="1" transform="rotate(-42 100 100)"><textPath href="#bo" startOffset="2" textLength="490">CREATIVE · PRODUCTIONS · AMIGO · STUDIOS ·</textPath></text>
+    <text font-size="10.5" letter-spacing=".6" transform="rotate(-28 100 100)"><textPath href="#bi" startOffset="20" textLength="318">825 SOUTH COAST HWY. OCEANSIDE, CALIFORNIA ·</textPath></text>
+    <text x="100" y="94" font-size="15" text-anchor="middle" letter-spacing="2">HWY</text><text x="100" y="126" font-size="26" text-anchor="middle" letter-spacing="1">101</text></g></svg>`;
+}
+// the sand clip as a faint looping layer behind a section; plays only while on screen (no blend modes)
+function sandIn(sec) {
+  if (!sec || $('.sandv', sec)) return; const sv = document.createElement('video'); sv.className = 'sandv'; sv.muted = true; sv.loop = true; sv.playsInline = true; sv.setAttribute('playsinline', ''); sv.setAttribute('aria-hidden', 'true'); sv.preload = 'metadata'; sv.poster = 'assets/clips/sand.jpg'; sv.src = 'assets/clips/sand.mp4'; sec.insertBefore(sv, sec.firstChild);
+  if (!RM && 'IntersectionObserver' in window) new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? sv.play().catch(() => { }) : sv.pause()), { rootMargin: '100px' }).observe(sec);
+}
+// How it goes, illustrated with one real job (Hook to Wormhole): wireframe -> storyboard frame -> final render, 16:9 + 9:16
+function wireTunnel() {
+  const W = 320, H = 180, cx = 172, cy = 86; let s = '';
+  for (let i = 0; i < 7; i++) s += `<rect class="wr" style="--i:${i}" x="${cx - 150}" y="${cy - 84}" width="300" height="168" rx="26"/>`
+  const rays = [[0, 0], [W, 0], [0, H], [W, H], [W / 2, 0], [0, H * .55]].map(([x, y]) => `<path class="wy" d="M${x} ${y}L${cx} ${cy}"/>`).join('');
+  return `<svg class="wire" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${rays}${s}<path class="wg" d="M${cx - 6} ${cy + 10}l4-18 3 0-4 18zM${cx - 4} ${cy - 8}l2-6"/><circle class="wd" cx="${cx - 2}" cy="${cy + 10}" r="5"/></svg>`;
 }
 function door(key, href) {
   const d = DOORS[key];
@@ -353,9 +380,11 @@ function parallax() {
 function tick() {
   parallax(); if (!WAY) return;
   const max = document.documentElement.scrollHeight - innerHeight, p = max > 0 ? clamp(scrollY / max) : 0, y = scrollY + innerHeight * (.36 + .46 * p), w = WAY;
-  if (y <= w.y0) tgt = 0;
+  if (y <= w.y0) tgt = Math.max(-120, y - w.y0); // above the start: the board waits under the shelf line and slides out of it (11-26)
   else if (y >= w.yEnd) tgt = Math.min(w.len, w.lenMain + (y - w.yEnd) * 1.4);
   else { let a = 0, b = w.ys.length - 1; while (b - a > 1) { const c = (a + b) >> 1; w.ys[c] < y ? a = c : b = c } const r = (y - w.ys[a]) / Math.max(.001, w.ys[b] - w.ys[a]); tgt = (a + clamp(r)) * w.step }
+  // at the very bottom the line always closes (the last stretch could stay dotted when the page ends before the board gets there)
+  if (max > 0 && scrollY >= max - 4) tgt = w.len + 30;
   // phones: the board tracks the scroll directly (the eased glide read as lag on touch scrolling)
   if (RM || COARSE) { cur = tgt; paint() } else if (!wraf) wraf = requestAnimationFrame(glide);
 }
@@ -368,7 +397,7 @@ function spray(now) {
   if (COARSE) {
     const cv = WAY && WAY.spray, x = cv && cv.getContext('2d'); if (!x) { PARTS = []; sraf = 0; return }
     const [ox, oy] = off(), dp = cv._dp, dark = cv.dataset.ground === 'paper' || cv.dataset.ground === 'tan';
-    x.setTransform(dp, 0, 0, dp, 0, 0); x.clearRect(0, 0, cv.width, cv.height); x.fillStyle = '#FCFAF5'; x.strokeStyle = '#1E150F'; x.lineWidth = 1;
+    x.setTransform(dp, 0, 0, dp, 0, 0); x.clearRect(0, 0, cv.width, cv.height); x.fillStyle = '#FCFAF5'; x.strokeStyle = 'rgba(70,46,26,.3)'; x.lineWidth = .8;
     PARTS = PARTS.filter(p => { p.t += dt; if (p.t >= p.life) return false; const k = Math.pow(.04, dt); p.vx *= k; p.vy = p.vy * k + 90 * dt; p.x += p.vx * dt; p.y += p.vy * dt; const u = p.t / p.life; x.globalAlpha = 1 - u * u; x.beginPath(); x.arc(p.x + ox, p.y + oy, p.r, 0, 6.2832); x.fill(); if (dark) x.stroke(); return true });
     x.globalAlpha = 1; sraf = PARTS.length ? requestAnimationFrame(spray) : (x.clearRect(0, 0, cv.width, cv.height), 0); return
   }
@@ -379,9 +408,12 @@ function at(L) { const w = WAY, u = clamp(L, 0, w.len) / w.step, i = Math.min(w.
 function off() { const w = WAY; return COARSE ? [w.pl - scrollX, w.pt - scrollY] : [0, 0] }
 function paint() {
   // Austin 11-25: the board doesn't take the hard turn into the horizon; it fades out at the bottom of the last vertical (the line still inks on)
-  const w = WAY, L = clamp(cur, 0, w.len), Lb = Math.min(L, w.lenMain - 4), a = at(Math.max(0, Lb - 3)), b = at(Math.min(w.len, Lb + 3)), pt = at(Lb), [ox0, oy0] = off();
+  const w = WAY, Lr = Math.min(cur, w.len + 30), L = Math.max(0, Lr), Lb = Math.min(L, w.lenMain - 4), a = at(Math.max(0, Lb - 3)), b = at(Math.min(w.len, Lb + 3)), pt = at(Lb), [ox0, oy0] = off();
+  // reveal: before the start the board sits back up the line, and the part above the start point is clipped, so it slides out from under the shelf line
+  const up = Math.min(0, Lr); if (up < 0) { const dx = b.x - a.x, dy = b.y - a.y, dl = Math.hypot(dx, dy) || 1; pt.x += dx / dl * up; pt.y += dy / dl * up }
+  const cut = clamp(26 - Lr, 0, 52), cl = cut > 0 ? `inset(0 0 0 ${cut.toFixed(1)}px)` : 'none'; if (w.rider.firstChild.style.clipPath !== cl) { w.rider.firstChild.style.clipPath = cl; w.rider.firstChild.style.webkitClipPath = cl }
   // 11-26: it also stays hidden until you start scrolling, then fades in (it read as floating while the page sat still)
-  const fo = Math.min(clamp((w.lenMain - 4 - L) / 90), RM ? 1 : clamp((scrollY - 24) / 150)), bs = w.rider.firstChild.style; if (bs.opacity !== fo.toFixed(2)) bs.opacity = fo.toFixed(2);
+  const fo = clamp((w.lenMain - 4 - L) / 90), bs = w.rider.firstChild.style; if (bs.opacity !== fo.toFixed(2)) bs.opacity = fo.toFixed(2);
   const drawn = Math.max(0, L - 30);
   const ink = () => w.sols.forEach(p => { if (drawn <= 0) { p.style.visibility = 'hidden' } else { p.style.visibility = ''; p.style.strokeDasharray = drawn + ' ' + (w.len + 60) } });
   if (COARSE) { clearTimeout(w.inkT); w.inkT = setTimeout(ink, 140) } else ink();
@@ -404,13 +436,15 @@ function specialty() {
   document.title = d[0] + ' · Amigo Animation B';
   root.innerHTML = `
   <header data-g="black" data-g2="black"><div class="bar inner"><a class="name" href="index.html">Amigo Animation</a><nav><a href="index.html#work">Work</a><a href="index.html#doors">What we make</a><a href="index.html#about">Team</a><a class="go" href="index.html#start">Start a project</a></nav></div>
+    <video class="hvid" src="assets/clips/jiffy_starborn.mp4" poster="assets/clips/jiffy_starborn.jpg" muted loop playsinline autoplay preload="metadata" aria-hidden="true"></video>
     <div class="inner"><div class="col shero in"><div><h1>${d[0]}</h1><p>[One line]</p></div><div class="big">${icon(key, Math.round(Math.min(260, innerWidth * .52)))}</div></div></div></header>
-  <section data-g="black" data-g2="tan"><div class="inner sec"><div class="col"><h2 class="hd">What you get</h2><div class="c3">${[0, 1, 2].map(() => '<div>[Deliverable]<p>[One line]</p></div>').join('')}</div></div></div></section>
+  <section data-g="black" data-g2="tan" class="getsec"><div class="inner sec"><div class="col"><h2 class="hd">What you get</h2><div class="c3">${[0, 1, 2].map(() => '<div>[Deliverable]<p>[One line]</p></div>').join('')}</div></div></div></section>
   <section data-g="night" data-side="r" id="work"><div class="inner sec"><div class="col"><h2 class="hd">Work<small>Placeholders until the pieces are picked</small></h2><div class="work">${SPEC_WORK[key].map((k, i) => piece(k, i < 2 ? 'w6' : 'w4')).join('')}</div></div></div></section>
-  <section data-g="terra" data-g2="night" data-side="r"><div class="inner sec"><div class="col"><h2 class="hd">How it goes</h2><div class="steps" data-in><svg class="art tl" aria-hidden="true"></svg>${['Concept', 'Storyboard and style frames', 'Animation and delivery'].map(s => `<div>${s}<p>[One line]</p></div>`).join('')}</div></div></div></section>
+  <section data-g="terra" data-g2="night" data-side="r"><div class="inner sec"><div class="col"><h2 class="hd">How it goes</h2><div class="steps" data-in><svg class="art tl" aria-hidden="true"></svg>${['Concept', 'Storyboard and style frames', 'Animation and delivery'].map((s, i) => `<div><figure class="pv pv${i}">${[wireTunnel(), '<img src="assets/process/board.jpg" alt="Storyboard frame: the wormhole" loading="lazy">', '<video src="assets/process/final.mp4" poster="assets/process/final.jpg" muted loop playsinline autoplay preload="metadata" aria-label="Final render: the wormhole"></video><img class="tall" src="assets/process/final_9x16.jpg" alt="The same shot delivered at 9:16" loading="lazy">'][i]}</figure>${s}<p>[One line]</p></div>`).join('')}</div><p class="pvnote">Shown with one real job, Hook to Wormhole for Jiffy Learning</p></div></div></section>
   <section data-g="tan" data-g2="black"><div class="inner sec"><div class="col"><h2 class="hd">Other specialties</h2><div class="doors">${Object.keys(DOORS).filter(k => k !== key).map(k => door(k, 'specialty.html#' + k)).join('')}</div></div></div></section>
   <section data-g="paper" data-g2="black" class="endcap"><div class="inner sec"><div class="col cta"><h2 class="hd">Have one of these in mind?</h2><a class="btn" href="index.html#start">Start a project ${ARROW}</a><footer style="align-self:stretch"><span>Amigo Productions, Oceanside CA</span><span>[Links and social]</span></footer></div></div></section>`;
   $('header', root).style.setProperty('--tt', '92px');
+  sandIn($('.getsec', root));
   scrollTo(0, 0);
 }
 
@@ -476,13 +510,13 @@ function endcap() { const cap = $('.endcap'); if (!cap) return; const h = $('.hd
 function layout(play) { branches(); hero(play); horizon(); endcap(); fit(); way(); tick() }
 function init() {
   const cl = $('#clients'), mini = cl && cl.classList.contains('mini'); if (cl && window.AM_LOGOS) cl.innerHTML = (cl.dataset.list ? cl.dataset.list.split(',') : CLIENTS).slice(0, +(cl.dataset.n || 99)).map(k => { const l = AM_LOGOS[k]; if (!l) return ''; const w = Math.round((mini ? (phone() ? 24 : 30) : (phone() ? 40 : 50)) * Math.pow(l.w / l.h, .62)); return `<span title="${l.name}"><svg role="img" aria-label="${l.name}" width="${w}" height="${Math.round(w * l.h / l.w)}" viewBox="0 0 ${l.w} ${l.h}"><path transform="${l.t}" d="${l.d}"/></svg></span>` }).join('');
-  // the underwater-sand clip (amigosd.com text texture) behind the client logos, faint, plays only while on screen (no blend modes)
   // sand clip: behind the clients on the reel version; behind the orange What we make section on the gallery version (Austin 11-26)
-  const cs = $('.gal') ? $('#doors') : cl && cl.closest('section'); if (cs && !$('.sandv', cs)) { const sv = document.createElement('video'); sv.className = 'sandv'; sv.muted = true; sv.loop = true; sv.playsInline = true; sv.setAttribute('playsinline', ''); sv.setAttribute('aria-hidden', 'true'); sv.preload = 'metadata'; sv.poster = 'assets/clips/sand.jpg'; sv.src = 'assets/clips/sand.mp4'; cs.insertBefore(sv, cs.firstChild);
-    if (!RM && 'IntersectionObserver' in window) new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? sv.play().catch(() => { }) : sv.pause()), { rootMargin: '100px' }).observe(cs) }
+  sandIn($('.gal') ? $('#doors') : cl && cl.closest('section'));
   $$('[data-work]').forEach(w => w.innerHTML = w.dataset.work.split(',').map(s => { const [k, c] = s.split(':'); return piece(k, c) }).join(''));
   $$('[data-doors]').forEach(w => w.innerHTML = w.dataset.doors.split(',').map(k => door(k, 'specialty.html#' + k)).join(''));
   specialty();
+  // footer: the badge replaces the [Links and social] slot (Austin 11-26)
+  $$('footer span').forEach(s => { if (s.textContent.trim() === '[Links and social]') { s.className = 'fbdg'; s.innerHTML = badge(phone() ? 108 : 132) } });
   $$('.bar .name').forEach(a => { a.innerHTML = logoSvg(phone() ? 40 : 46) + '<span class="sr">Amigo Animation, home</span>'; a.setAttribute('aria-label', 'Amigo Animation, home') });
   let m = 'dusk'; try { m = localStorage.getItem('amigo-b-ground2') || m } catch (e) { }
   $$('.grounds button[data-m]').forEach(b => b.addEventListener('click', () => ground(b.dataset.m)));

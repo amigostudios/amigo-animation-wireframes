@@ -460,3 +460,44 @@ section[data-ground]{background-blend-mode:normal}
 .hd:not(.lbl){font-size:clamp(28px,3vw,44px);line-height:1.05}
 .close h2{font-size:clamp(44px,7vw,104px);line-height:.95}
 .hd small,.hd a{font-family:var(--sans);text-transform:none;letter-spacing:0}
+/* ---- v27 (11-26) ---- */
+/* board + spray on the light grounds (tan, paper): white foam with only a faint warm edge, the board with a soft warm outline and a lifted shadow (no black) */
+[data-ground="paper"] .f.bd,[data-ground="tan"] .f.bd,#rider[data-ground="paper"] .f.bd,#rider[data-ground="tan"] .f.bd{stroke:rgba(70,46,26,.38);stroke-width:1px}
+#rider[data-ground="paper"] svg,#rider[data-ground="tan"] svg{filter:drop-shadow(0 3px 4px rgba(70,46,26,.28))}
+[data-ground="paper"] #spray circle,[data-ground="tan"] #spray circle,#spray[data-ground="paper"] circle,#spray[data-ground="tan"] circle{stroke:rgba(70,46,26,.3);stroke-width:.8px}
+/* doors read as buttons: the "See …" label sits in a pill with a round arrow, the whole row lifts on hover */
+.door{border-radius:4px;transition:background .3s}
+.door em{border:var(--lw) solid var(--dim);border-radius:99px;padding:10px 12px 10px 20px;color:var(--ln);transition:border-color .3s,background .3s,color .3s}
+.door em svg{box-sizing:content-box;padding:7px;border-radius:50%;background:var(--ln);color:var(--bg)}
+.door:hover em{border-color:var(--ln);background:rgba(240,233,220,.08)}
+@media (max-width:860px){.door em{justify-self:start;margin-top:12px;padding:7px 8px 7px 16px;font-size:15px}}
+/* footer: place left, the Amigo badge right */
+footer{align-items:center}
+.fbdg{display:block;line-height:0;color:var(--ln)}
+.fbdg .bdg{display:block;opacity:.9}
+/* specialty header: full-bleed looping video under a dark wash */
+header .hvid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;pointer-events:none}
+header:has(.hvid)::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(11,10,10,.55),rgba(11,10,10,.15) 40%,rgba(11,10,10,.7))}
+header:has(.hvid) .inner{position:relative;z-index:2}
+header:has(.hvid) .bar{z-index:4}
+.getsec .inner{position:relative}
+/* How it goes: one real job, step by step */
+.steps .pv{position:relative;margin:0 0 18px;aspect-ratio:16/9;background:#0B0A0A;border:var(--lw) solid var(--hair);overflow:hidden}
+.steps .pv img,.steps .pv video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.steps .pv .tall{left:auto;right:10px;top:auto;bottom:10px;width:22%;height:auto;aspect-ratio:9/16;border:1.5px solid rgba(240,233,220,.85);box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.steps .wire{position:absolute;inset:0;width:100%;height:100%}
+.wire .wr,.wire .wy,.wire .wg,.wire .wd{fill:none;stroke:#F0E9DC;stroke-width:1.2px;vector-effect:non-scaling-stroke}
+.wire .wy{stroke-opacity:.3;stroke-dasharray:2 5}
+.wire .wd{stroke-opacity:.8}
+.wire .wr{transform-box:view-box;transform-origin:54% 48%;animation:wfly 3.2s linear infinite;animation-delay:calc(var(--i) * -.457s);opacity:0}
+@keyframes wfly{0%{transform:scale(.05);opacity:0}20%{opacity:.85}45%{transform:scale(.2)}70%{transform:scale(.5)}85%{opacity:.85}100%{transform:scale(1.5);opacity:0}}
+@media (prefers-reduced-motion:reduce){.wire .wr{animation:none;opacity:.8;transform:scale(calc(1.2 / (1 + var(--i) * .9)))}}
+.pvnote{margin-top:22px;font-size:14px;color:var(--soft)}
+.steps div{padding-top:34px}
+.steps:has(.pv) svg.tl{top:auto}
+/* the studio text section under the team */
+.story{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:28px clamp(30px,5vw,80px);margin-top:clamp(28px,4vw,48px);align-items:start}
+.story .lead{font-size:clamp(24px,2.6vw,38px);font-weight:300;letter-spacing:-.015em;line-height:1.25}
+.story .cols p{color:var(--soft);font-size:17px;line-height:1.6}
+.story .cols p+p{margin-top:16px}
+@media (max-width:860px){.story{grid-template-columns:minmax(0,1fr)}}
