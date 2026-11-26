@@ -107,7 +107,7 @@ function hero(play) {
     if (BIG) { const top = 92, hA = gy - h - 34 - top; rw = Math.max(260, Math.min(W - 2 * x0 - 200, hA * 16 / 9)); rx = (W - rw) / 2; ry = top + (hA - rw * 9 / 16) / 2; const mg = W - rx - rw; if (V === 'sun') { R = Math.min(84, mg * .36); xs = rx + rw + mg / 2 } else xs = rx + rw + Math.min(40, mg * .2) }
   } else {
     // phones: the reel is front and centre, full width; the drawing band under it is short so the whole hero fits one screen
-    const band = 138; rw = W - 32; rx = 16; ry = 92; yTop = ry + rw * 9 / 16 + 34; gy = yTop + band;
+    const band = V === 'none' ? 44 : 138; rw = W - 32; rx = 16; ry = 92; yTop = ry + rw * 9 / 16 + 34; gy = yTop + band;
     if (V === 'palm') { palmDims(band / 1.16); bx = W * .64 } else if (V === 'wave') { k = Math.min((band - 22) / 605, W * .7 / 1046); xs = W - 26 - 1046 * k } else if (V === 'sun') { R = Math.min(62, band * .4); xs = W * .64 } else xs = W * .3;
     h = Math.min(64, (W - x0 - 18) / 6.26); if (SC) { SF = scriptFit(W - x0 - 22, 150); h = SF.cap } wy = gy + 52 + h; Hh = Math.round(wy + 104);
   }
@@ -147,6 +147,9 @@ function hero(play) {
     stem = [[-20, gy], [W + 20, gy]]; end = [xs, gy];
     sunMk = `<defs><clipPath id="sunc"><rect x="0" y="-400" width="${W}" height="${gy + 400}"/></clipPath></defs><g class="sung"><g clip-path="url(#sunc)"><circle class="sunf" cx="${xs}" cy="${gy + R + 6}" r="${R}"/></g></g>`;
     extra = (ph ? [[16, .62, .9], [31, .38, .6]] : [[20, .62, .9], [40, .38, .6], [60, .16, .35]]).map(([dy, hw, o]) => `<path class="tick" style="opacity:${o}" d="M${xs - R * hw} ${gy + dy}H${xs + R * hw}"/>`).join('');
+  } else if (V === 'none') {
+    // no drawing: the line comes in and runs flat along the shelf edge, off the right side
+    stem = [[-20, gy], [W + 20, gy]]; end = [W + 20, gy];
   } else {
     // the ease curve (style frame Q1): the line leaves the ground at one keyframe and eases up to the next. Handles are the true control points
     const P0 = [xs, gy], P3 = [W - (ph ? 34 : Math.max(30, Math.min(84, (W - xs) * .3))), yTop + (ph ? 26 : 56)], dx = P3[0] - P0[0], c1 = [P0[0] + dx * .62, P0[1]], c2 = [P3[0] - dx * .62, P3[1]], bz = [];
@@ -185,7 +188,7 @@ function frame(S, t) {
   if (S.sun) S.sun.setAttribute('cy', (S.gy + (S.sunR + 6) * (all ? 0 : 1 - easeOut5(clamp((t - 1.3) / 2.2)))).toFixed(1));
   const v = clamp((t - S.tF - 1) / .7), pulse = all ? 1 : 1 + .55 * Math.sin(Math.PI * v) * (1 - v);
   S.light.style.transform = `translate(${pos.x.toFixed(1)}px,${pos.y.toFixed(1)}px) scale(${pulse.toFixed(3)})`;
-  S.light.style.opacity = t < .3 ? 0 : 1;
+  S.light.style.opacity = t < .3 || TOP === 'none' ? 0 : 1;
   S.guide.style.opacity = all ? 0 : 1 - clamp((t - S.tF - .5) / .6);
   if (S.sc) S.sc.style.setProperty('--wv', all ? 1 : S.ph ? easeIO(clamp((t - S.tL) / 1.3)).toFixed(3) : clamp((d - S.scX - 20) / S.scW).toFixed(3));
   if (S.reel) S.reel.style.setProperty('--rv', all ? 1 : easeIO(clamp((t - .55) / 1.5)).toFixed(3));
@@ -418,7 +421,7 @@ function init() {
   $$('.bar .name').forEach(a => { a.innerHTML = logoSvg(phone() ? 40 : 46) + '<span class="sr">Amigo Animation, home</span>'; a.setAttribute('aria-label', 'Amigo Animation, home') });
   let m = 'dusk'; try { m = localStorage.getItem('amigo-b-ground2') || m } catch (e) { }
   $$('.grounds button[data-m]').forEach(b => b.addEventListener('click', () => ground(b.dataset.m)));
-  try { TOP = localStorage.getItem('amigo-b-top') || TOP } catch (e) { } if (!['curve', 'wave', 'sun'].includes(TOP)) TOP = 'curve';
+  try { TOP = localStorage.getItem('amigo-b-top') || TOP } catch (e) { } if (!['curve', 'wave', 'sun'].includes(TOP)) TOP = 'curve'; TOP = 'none'; // Austin 11-25: no drawing on top (Curve/Wave/Sun read as distracting); the line just runs along the shelf. Drawing code kept for reference
   const setTop = (v, go) => { TOP = v; $$('.grounds button[data-v]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); try { localStorage.setItem('amigo-b-top', v) } catch (e) { } if (go) { scrollTo(0, 0); hero(true); way(); tick() } };
   $$('.grounds button[data-v]').forEach(b => b.addEventListener('click', () => setTop(b.dataset.v, true))); setTop(TOP, false);
   try { WORD = localStorage.getItem('amigo-b-word') || WORD } catch (e) { } WORD = 'line'; // Austin picked Line 11-25; script code kept for reference
