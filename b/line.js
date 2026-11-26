@@ -436,7 +436,7 @@ function specialty() {
   document.title = d[0] + ' · Amigo Animation B';
   root.innerHTML = `
   <header data-g="black" data-g2="black"><div class="bar inner"><a class="name" href="index.html">Amigo Animation</a><nav><a href="index.html#work">Work</a><a href="index.html#doors">What we make</a><a href="index.html#about">Team</a><a class="go" href="index.html#start">Start a project</a></nav></div>
-    <video class="hvid" src="assets/clips/jiffy_starborn.mp4" poster="assets/clips/jiffy_starborn.jpg" muted loop playsinline autoplay preload="metadata" aria-hidden="true"></video>
+    <video class="hvid" src="assets/clips/starborn_bg.mp4" poster="assets/clips/starborn_bg.jpg" muted loop playsinline autoplay preload="metadata" aria-hidden="true"></video>
     <div class="inner"><div class="col shero in"><div><h1>${d[0]}</h1><p>[One line]</p></div><div class="big">${icon(key, Math.round(Math.min(260, innerWidth * .52)))}</div></div></div></header>
   <section data-g="black" data-g2="terra" class="getsec"><div class="inner sec"><div class="col"><h2 class="hd">What you get</h2><div class="c3">${[0, 1, 2].map(() => '<div>[Deliverable]<p>[One line]</p></div>').join('')}</div></div></div></section>
   <section data-g="night" data-side="r" id="work"><div class="inner sec"><div class="col"><h2 class="hd">Work<small>Placeholders until the pieces are picked</small></h2><div class="work">${SPEC_WORK[key].map((k, i) => piece(k, i < 2 ? 'w6' : 'w4')).join('')}</div></div></div></section>
