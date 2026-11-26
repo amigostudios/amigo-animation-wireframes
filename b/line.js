@@ -324,7 +324,7 @@ function horizon() {
   const W = sec.clientWidth, ph = phone(), gx = px('--gx'), hy = ph ? 120 : 170, r = ph ? 10 : 16, R = ph ? 34 : 50, sx = W * (ph ? .7 : .74), k = R / 50;
   svg.setAttribute('viewBox', `0 0 ${W} ${hy + 80}`); svg.style.height = hy + 80 + 'px';
   HZ = { hy, r }; sec.style.setProperty('--sr', R + 10 + 'px'); $('.inner', sec).style.paddingTop = hy + (ph ? 84 : 120) + 'px';
-  const bird = (x, y, s) => `<g class="bird" style="--bd:${(x % 7 / 10).toFixed(1)}s"><path class="s ln" pathLength="1" style="--d:1.9s;--t:.8s" d="M${x - 46 * s} ${y - 2 * s}Q${x - 23 * s} ${y - 20 * s} ${x} ${y}Q${x + 23 * s} ${y - 20 * s} ${x + 46 * s} ${y - 2 * s}"/></g>`;
+  const bird = (x, y, s) => `<g class="bird" style="--bd:${(x % 7 / 10).toFixed(1)}s"><path class="s ln" pathLength="1" style="--d:.4s;--t:.9s" d="M${x - 46 * s} ${y - 2 * s}Q${x - 23 * s} ${y - 20 * s} ${x} ${y}Q${x + 23 * s} ${y - 20 * s} ${x + 46 * s} ${y - 2 * s}"/></g>`;
   svg.innerHTML = `<defs><clipPath id="hzc"><rect x="0" y="-200" width="${W}" height="${hy + 200}"/></clipPath></defs>
   <g clip-path="url(#hzc)"><circle class="sun" cx="${sx}" cy="${hy}" r="${R}"/></g>
   <path class="s ln" pathLength="1" style="--t:1.5s" d="M${gx} ${hy - r}A${r} ${r} 0 0 0 ${gx + r} ${hy}H${W + 6}"/>
@@ -369,11 +369,24 @@ function way() {
   else spr.innerHTML = '';
   const pr = page.getBoundingClientRect();
   WAY = { secs, f, sols: $$('.sol', svg), rider, spray: spr, lenMain, len, step, ys, y0: ys[0], yEnd, T, n, pl: pr.left + scrollX, pt: pr.top + scrollY, tops: secs.map(s => s.offsetTop), Hp }; PARTS = [];
+  { const w = WAY, st = 4, n = Math.max(2, Math.ceil((w.yEnd - w.y0) / st) + 1), raw = new Float32Array(n);
+    for (let k = 0; k < n; k++) { const y = w.y0 + k * st; let a = 0, b = w.ys.length - 1; while (b - a > 1) { const c = (a + b) >> 1; w.ys[c] < y ? a = c : b = c } raw[k] = (a + clamp((y - w.ys[a]) / Math.max(.001, w.ys[b] - w.ys[a]))) * w.step }
+    let sm = raw; const K = 24; for (let pass = 0; pass < 2; pass++) { const o = new Float32Array(n); let acc = 0; const pre = new Float64Array(n + 1); for (let k = 0; k < n; k++) pre[k + 1] = pre[k] + sm[k]; for (let k = 0; k < n; k++) { const lo = Math.max(0, k - K), hi = Math.min(n - 1, k + K); o[k] = (pre[hi + 1] - pre[lo]) / (hi - lo + 1) } sm = o }
+    sm[0] = 0; sm[n - 1] = w.lenMain; for (let k = 1; k < n; k++) if (sm[k] < sm[k - 1]) sm[k] = sm[k - 1];
+    w.LY = sm; w.lyS = st }
   $$('.sol', svg).forEach(p => p.style.background = 'none'); $$('#way g').forEach(g => g.style.background = 'none');
 }
 // header photo parallax: the photo drifts down at ~30% of the scroll speed while the header is on screen (moves a layer inside a square clip, no rounded clip)
 let WALL = null, wPy = -1;
+// the close: the sun rises with the scroll as Start a project comes up, and its glow grows with it (11-26)
+let SUN = null, sPv = -1;
+function sunrise() {
+  const s = SUN || (SUN = $('#start')); if (!s) return;
+  const r = s.getBoundingClientRect(), v = RM ? 1 : Math.round(clamp((innerHeight * .98 - r.top) / (innerHeight * .62)) * 100) / 100;
+  if (v !== sPv) { sPv = v; s.style.setProperty('--sp', v) }
+}
 function parallax() {
+  sunrise();
   if (RM) return; const w = WALL || (WALL = $('.wall')); if (!w) return;
   const hh = w.offsetHeight, y = Math.min(scrollY, hh + 200), py = Math.round(Math.min(y * .3, hh * .3)); if (py === wPy) return; wPy = py; w.style.setProperty('--py', py + 'px');
 }
@@ -382,20 +395,20 @@ function tick() {
   const max = document.documentElement.scrollHeight - innerHeight, p = max > 0 ? clamp(scrollY / max) : 0, y = scrollY + innerHeight * (.36 + .46 * p), w = WAY;
   if (y <= w.y0) tgt = Math.max(-120, y - w.y0); // above the start: the board waits under the shelf line and slides out of it (11-26)
   else if (y >= w.yEnd) tgt = Math.min(w.len, w.lenMain + (y - w.yEnd) * 1.4);
+  else if (COARSE && w.LY) { const u = (y - w.y0) / w.lyS, k = Math.min(w.LY.length - 2, Math.floor(u)), r = u - k; tgt = w.LY[k] + (w.LY[k + 1] - w.LY[k]) * r }
   else { let a = 0, b = w.ys.length - 1; while (b - a > 1) { const c = (a + b) >> 1; w.ys[c] < y ? a = c : b = c } const r = (y - w.ys[a]) / Math.max(.001, w.ys[b] - w.ys[a]); tgt = (a + clamp(r)) * w.step }
   // at the very bottom the line always closes (the last stretch could stay dotted when the page ends before the board gets there)
   if (max > 0 && scrollY >= max - 4) tgt = w.len + 30;
   // phones: the board tracks the scroll directly (the eased glide read as lag on touch scrolling)
-  if (RM) { cur = tgt; paint() } else if (COARSE) follow(); else if (!wraf) wraf = requestAnimationFrame(glide);
+  if (RM || COARSE) { cur = tgt; paint() } else if (!wraf) wraf = requestAnimationFrame(glide);
 }
 let fraf = 0, fy = -1, fidle = 0;
-function follow() { fidle = 0; if (WAY && cur !== tgt) { ease(); paint() } if (!fraf) fraf = requestAnimationFrame(fstep) }
+function follow() { fidle = 0; if (!fraf) fraf = requestAnimationFrame(fstep) }
 // phones: ease toward the target (glides through the curves) but never more than 150 px of line behind, however slow the frames
 function ease() { let d = tgt - cur; if (Math.abs(d) > 150) { cur = tgt - Math.sign(d) * 150; d = tgt - cur } cur += d * .3; if (Math.abs(tgt - cur) < .5) cur = tgt }
 function fstep() {
-  fraf = 0; if (scrollY !== fy) { fy = scrollY; fidle = 0; tick(); return } fidle++;
-  // phones (11-26): ease toward the target with a speed cap, so the board glides through the curves instead of snapping
-  if (WAY && cur !== tgt) { ease(); paint(); fidle = 0 }
+  // phones: reads scrollY every frame while the finger or momentum is moving (iOS scroll events can arrive late)
+  fraf = 0; if (scrollY !== fy) { fy = scrollY; fidle = 0; tick() } else fidle++;
   if (fidle < 30) fraf = requestAnimationFrame(fstep)
 }
 function glide() { wraf = 0; cur += (tgt - cur) * .13; if (Math.abs(tgt - cur) < .4) cur = tgt; paint(); if (cur !== tgt) wraf = requestAnimationFrame(glide) }
@@ -423,7 +436,7 @@ function paint() {
   const fo = clamp((w.lenMain - 4 - L) / 90), bs = w.rider.firstChild.style; if (bs.opacity !== fo.toFixed(2)) bs.opacity = fo.toFixed(2);
   const drawn = Math.max(0, L - 30);
   const ink = () => w.sols.forEach(p => { if (drawn <= 0) { p.style.visibility = 'hidden' } else { p.style.visibility = ''; p.style.strokeDasharray = drawn + ' ' + (w.len + 60) } });
-  if (COARSE) { const now = performance.now(); if (now - (w.inkAt || 0) > 50) { w.inkAt = now; ink() } clearTimeout(w.inkT); w.inkT = setTimeout(ink, 90) } else ink();
+  if (Math.abs(drawn - (w.inkD ?? -9)) > .8 || drawn <= 0) { w.inkD = drawn; ink() }
   w.rider.style.transform = `translate3d(${(pt.x + ox0).toFixed(1)}px,${(pt.y + oy0).toFixed(1)}px,0) rotate(${(Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI).toFixed(1)}deg)`;
   let g = 'black'; w.secs.forEach((s, i) => { if (pt.y >= w.tops[i]) g = s.dataset.ground }); w.rider.dataset.ground = g; w.spray.dataset.ground = g;
   // spray: when the board turns hard, dots fly off the tail on the outside of the turn
