@@ -487,6 +487,10 @@ function viewer(i) {
   $('.vlab b', V).textContent = w ? w[0] : ''; $('.vlab span', V).textContent = w ? w[1] : ''; $('.vlab small', V).textContent = `${i + 1} / ${n}`;
   V.classList.add('on'); document.documentElement.classList.add('vlock'); $('.vx', V).focus({ preventScroll: true });
 }
+function swipes() {
+  if (!phone()) return; $$('.work:not(.gal)').forEach(w => { if (w._sw) return; w._sw = 1; const n = w.children.length, c = document.createElement('p'); c.className = 'swipe'; c.innerHTML = `<span>1 / ${n}</span> Swipe for more ${ARROW}`; w.after(c);
+    let r = 0; w.addEventListener('scroll', () => { if (r) return; r = requestAnimationFrame(() => { r = 0; const k = Math.round(w.scrollLeft / (w.children[0].offsetWidth + 12)); c.firstChild.textContent = `${Math.min(n, k + 1)} / ${n}` }) }, { passive: true }) });
+}
 function wire() {
   const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target) } }), { threshold: .12, rootMargin: '0px 0px -6% 0px' });
   $$('[data-in]').forEach(e => { if (!e._o) { e._o = 1; obs.observe(e) } });
@@ -515,8 +519,10 @@ function init() {
   $$('[data-work]').forEach(w => w.innerHTML = w.dataset.work.split(',').map(s => { const [k, c] = s.split(':'); return piece(k, c) }).join(''));
   $$('[data-doors]').forEach(w => w.innerHTML = w.dataset.doors.split(',').map(k => door(k, 'specialty.html#' + k)).join(''));
   specialty();
-  // footer: the badge replaces the [Links and social] slot (Austin 11-26)
-  $$('footer span').forEach(s => { if (s.textContent.trim() === '[Links and social]') { s.className = 'fbdg'; s.innerHTML = `<img src="assets/badge.svg" width="${phone() ? 108 : 132}" height="${phone() ? 108 : 132}" alt="Amigo Productions, Creative Studios, 825 South Coast Hwy, Oceanside, California">` } });
+  // footer: [Links and social] removed, and the badge taken out again (Austin 11-26); the footer is just the place line
+  $$('footer span').forEach(s => { if (s.textContent.trim() === '[Links and social]') s.remove() });
+  // phones: work rows become a sideways swipe with a counter, so the page is not one long scroll of past work (11-26)
+  swipes();
   $$('.bar .name').forEach(a => { a.innerHTML = logoSvg(phone() ? 40 : 46) + '<span class="sr">Amigo Animation, home</span>'; a.setAttribute('aria-label', 'Amigo Animation, home') });
   let m = 'dusk'; try { m = localStorage.getItem('amigo-b-ground2') || m } catch (e) { }
   $$('.grounds button[data-m]').forEach(b => b.addEventListener('click', () => ground(b.dataset.m)));
@@ -551,7 +557,7 @@ function init() {
   let q = false; addEventListener('scroll', () => { if (COARSE) return follow(); if (!q) { q = true; requestAnimationFrame(() => { q = false; tick() }) } }, { passive: true });
   if (COARSE) ['touchstart', 'touchmove'].forEach(e => addEventListener(e, follow, { passive: true }));
   addEventListener('load', () => { fit(); way(); tick() });
-  addEventListener('hashchange', () => { if ($('#spec')) { specialty(); ground(document.querySelector('.grounds button[data-m][aria-pressed="true"]').dataset.m); layout(false); wire() } });
+  addEventListener('hashchange', () => { if ($('#spec')) { specialty(); ground(document.querySelector('.grounds button[data-m][aria-pressed="true"]').dataset.m); layout(false); wire(); swipes() } });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (WORD !== 'line') { const go = () => layout(false); document.fonts.load(`100px "${FONTS[WORD]}"`, 'Motion').then(go, go) } else { fit(); way(); tick() } });
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

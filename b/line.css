@@ -509,3 +509,25 @@ header:has(.hvid) .bar{z-index:4}
 @media (max-width:700px){.clients.mini{display:flex;flex-wrap:wrap;justify-content:space-between}.clients.mini .brk{display:block;flex-basis:100%;height:0}}
 .wire .wr{transform:scale(calc(1.25 * pow(.64, var(--i))))}
 .wire .wr:nth-child(n+12){display:none}
+
+/* ---- v29 (11-26) ---- */
+/* How it goes: the three cards rise in one after another as the section scrolls into view */
+.js .steps>div{opacity:0;transform:translateY(28px);transition:opacity .7s var(--io),transform .9s var(--io)}
+.js .steps.in>div{opacity:1;transform:none}
+.js .steps.in>div:nth-of-type(2){transition-delay:.18s}.js .steps.in>div:nth-of-type(3){transition-delay:.36s}
+@media (prefers-reduced-motion:reduce){.js .steps>div{opacity:1;transform:none;transition:none}}
+/* birds at the close draw out from their centre */
+.js #hz .bird path.ln{stroke-dasharray:0 .5 0 1;stroke-dashoffset:0;transition:stroke-dasharray var(--t,.8s) var(--io) var(--d,0s)}
+.js .risen #hz .bird path.ln{stroke-dasharray:0 0 1 1}
+/* phones: shorter scroll */
+@media (max-width:700px){
+  .work:not(.gal){display:flex;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-right:calc(-1*max(var(--gx),env(safe-area-inset-right,0px)));padding-right:max(var(--gx),env(safe-area-inset-right,0px));row-gap:0}
+  .work:not(.gal)::-webkit-scrollbar{display:none}
+  .work:not(.gal)>.piece{flex:0 0 86%;scroll-snap-align:start;margin-top:0}
+  .swipe{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:14px;color:var(--soft)}
+  .swipe span{color:var(--ln);font-variant-numeric:tabular-nums}
+  .work.gal{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .gal .g2{grid-column:span 2}
+  .gal .lab{padding:24px 10px 8px;font-size:12px}.gal .lab span{display:none}
+  .door{padding-block:18px;gap:14px}.door strong{font-size:28px}.door small{margin-top:2px;font-size:14px}.door em{margin-top:8px}
+}
