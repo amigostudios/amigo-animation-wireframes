@@ -106,8 +106,9 @@ function hero(play) {
     const hAv = gy - h - 40 - 104; rw = Math.max(260, Math.min(wAv, hAv * 16 / 9)); ry = gy - h - 40 - rw * 9 / 16;
     if (BIG) { const top = 92, hA = gy - h - 34 - top; rw = Math.max(260, Math.min(W - 2 * x0 - 200, hA * 16 / 9)); rx = (W - rw) / 2; ry = top + (hA - rw * 9 / 16) / 2; const mg = W - rx - rw; if (V === 'sun') { R = Math.min(84, mg * .36); xs = rx + rw + mg / 2 } else xs = rx + rw + Math.min(40, mg * .2) }
   } else {
-    rw = W - x0 - 16; ry = 84; yTop = ry + rw * 9 / 16 + 30; gy = yTop + 232;
-    if (V === 'palm') { palmDims((gy - yTop) / 1.16); bx = W * .64 } else if (V === 'wave') { k = Math.min(206 / 605, W * .7 / 1046); xs = W - 26 - 1046 * k } else if (V === 'sun') { R = 62; xs = W * .64 } else xs = W * .3;
+    // phones: the reel is front and centre, full width; the drawing band under it is short so the whole hero fits one screen
+    const band = 138; rw = W - 32; rx = 16; ry = 92; yTop = ry + rw * 9 / 16 + 34; gy = yTop + band;
+    if (V === 'palm') { palmDims(band / 1.16); bx = W * .64 } else if (V === 'wave') { k = Math.min((band - 22) / 605, W * .7 / 1046); xs = W - 26 - 1046 * k } else if (V === 'sun') { R = Math.min(62, band * .4); xs = W * .64 } else xs = W * .3;
     h = Math.min(64, (W - x0 - 18) / 6.26); if (SC) { SF = scriptFit(W - x0 - 22, 150); h = SF.cap } wy = gy + 52 + h; Hh = Math.round(wy + 104);
   }
   if (reel) { reel.style.left = rx + 'px'; reel.style.top = ry + 'px'; reel.style.width = rw + 'px' }
@@ -145,7 +146,7 @@ function hero(play) {
     // the sun (style frame N7): the line runs straight through as the horizon, the light comes up over the shelf edge
     stem = [[-20, gy], [W + 20, gy]]; end = [xs, gy];
     sunMk = `<defs><clipPath id="sunc"><rect x="0" y="-400" width="${W}" height="${gy + 400}"/></clipPath></defs><g class="sung"><g clip-path="url(#sunc)"><circle class="sunf" cx="${xs}" cy="${gy + R + 6}" r="${R}"/></g></g>`;
-    extra = [[20, .62, .9], [40, .38, .6], [60, .16, .35]].map(([dy, hw, o]) => `<path class="tick" style="opacity:${o}" d="M${xs - R * hw} ${gy + dy}H${xs + R * hw}"/>`).join('');
+    extra = (ph ? [[16, .62, .9], [31, .38, .6]] : [[20, .62, .9], [40, .38, .6], [60, .16, .35]]).map(([dy, hw, o]) => `<path class="tick" style="opacity:${o}" d="M${xs - R * hw} ${gy + dy}H${xs + R * hw}"/>`).join('');
   } else {
     // the ease curve (style frame Q1): the line leaves the ground at one keyframe and eases up to the next. Handles are the true control points
     const P0 = [xs, gy], P3 = [W - (ph ? 34 : Math.max(30, Math.min(84, (W - xs) * .3))), yTop + (ph ? 26 : 56)], dx = P3[0] - P0[0], c1 = [P0[0] + dx * .62, P0[1]], c2 = [P3[0] - dx * .62, P3[1]], bz = [];
