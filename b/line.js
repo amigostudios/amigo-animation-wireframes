@@ -19,6 +19,8 @@ const px = (name) => parseFloat(getComputedStyle(document.documentElement).getPr
 const phone = () => innerWidth <= 860;
 const ARROW = '<svg width="20" height="12" viewBox="0 0 20 12" aria-hidden="true"><path d="M1 6h17M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
+const LOGO = {"OUTER": "M 104.929688 52.386719 C 105.949219 24.644531 86.003906 -0.75 57 0 C 37.886719 0.148438 15.671875 8.15625 7.105469 27.964844 C -7.171875 56.234375 6.359375 99.738281 42.167969 99.871094 L 42.183594 99.933594 C 50.785156 100.207031 61.042969 100.59375 68.25 98.625 C 84.703125 95.164062 96.996094 82.898438 102.304688 67.441406 C 103.472656 62.441406 104.78125 57.582031 104.929688 52.386719 ", "L": "M 48.941406 46.355469 C 49.628906 36.613281 47.664062 29.878906 49.207031 20.226562 C 49.863281 16.113281 57.125 16.105469 56.621094 21.113281 C 56.59375 29.839844 57.066406 37.328125 56.847656 45.871094 C 57 58.933594 53.65625 56.5625 67.542969 56.460938 C 71.457031 55.777344 74.859375 52.9375 74.964844 48.628906 C 75.042969 42.898438 74.960938 35.328125 75.609375 29.339844 C 78.789062 24.015625 81.609375 28.488281 81.761719 32.480469 C 81.261719 52.726562 83.546875 65.0625 58.4375 63.609375 C 56.078125 63.796875 57.183594 63.824219 56.699219 65.441406 C 56.992188 73.757812 56.816406 82.003906 56.957031 91.1875 C 56.558594 95.191406 56.683594 94.503906 53.332031 94.847656 C 52.890625 94.628906 48.910156 95.410156 49.167969 93.851562 C 46.761719 69.664062 55.144531 79.886719 32.65625 72.960938 C 32.441406 72.554688 32.507812 73.191406 32.40625 72.875 C 27.128906 71.75 25.332031 68.277344 24.753906 63.03125 C 24.632812 58.046875 22.796875 42.175781 25.214844 39.742188 C 37.367188 32.152344 24.996094 65.257812 34.707031 66.585938 C 38.179688 68.449219 42.847656 68.625 47.070312 68.832031 C 48.773438 69.097656 48.933594 68.699219 48.828125 67.246094 C 49.371094 60.644531 48.777344 53.066406 48.941406 46.355469 ", "R": "M 61.632812 51.039062 C 61.398438 50.71875 61.347656 50.378906 61.34375 49.929688 C 61.265625 40.59375 61.40625 30.863281 61.703125 21.214844 C 61.023438 8.894531 44.046875 10.328125 43.875 21.730469 C 44.136719 34.957031 43.890625 48.609375 44.085938 62.03125 C 44.144531 63.132812 43.984375 63.507812 42.652344 63.347656 C 40.597656 62.460938 35.671875 64.191406 35.757812 60.308594 C 33.777344 52.132812 41.011719 34.527344 28.191406 33.621094 C 20.371094 32.558594 17.707031 41.757812 19.042969 48.285156 C 19.320312 54.9375 18.171875 61.921875 21.109375 68.164062 C 23.511719 76.796875 34.410156 78.375 41.753906 80.316406 C 42.023438 80.339844 42.394531 80.582031 42.789062 80.566406 C 44.402344 80.859375 44.003906 81.421875 44.183594 82.894531 C 44.285156 86.226562 44.074219 89.316406 44.40625 93.03125 C 44.699219 94.03125 43.480469 94.570312 42.664062 94.585938 C -2.746094 93.785156 -4.453125 22.453125 34.40625 9.558594 C 107.597656 -16.574219 121.703125 85.023438 63.582031 94.214844 C 60.042969 95.007812 62.644531 73.714844 61.710938 70.765625 C 61.710938 68.949219 61.292969 68.484375 64.121094 68.3125 C 86.835938 67.953125 87.277344 48.972656 86.421875 30.933594 C 86.398438 23.449219 76.4375 18.425781 71.851562 25.410156 C 69.382812 30.800781 70.769531 38.640625 70.296875 44.492188 C 70.160156 51.699219 68.019531 51.320312 62.53125 51.277344 C 62.15625 51.273438 62.039062 51.105469 61.632812 51.039062 "};
+const logoSvg = z => `<svg width="${z}" height="${Math.round(z * .953)}" viewBox="0 0 106 101" aria-hidden="true"><path fill="#F3E9DA" d="${LOGO.OUTER}"/><path fill="#BA6441" d="${LOGO.L}"/><path fill="#BA6441" d="${LOGO.R}"/></svg>`;
 const WORK = { airport: ['Holiday Spot', 'San Diego Airport'], zebra_inventory: ['Workcloud Inventory Visibility', 'Zebra'], zebra_timekeeping: ['Workcloud Timekeeping', 'Zebra'], zebra_scheduling: ['Workcloud Scheduling', 'Zebra'], jiffy_hook: ['Hook to Wormhole', 'Jiffy Learning'], jiffy_starborn: ['Star Born', 'Jiffy Learning'] };
 const DOORS = { commercials: ['Commercials', 'See commercials'], ui: ['UI and explainers', 'See UI work'], '3d': ['3D', 'See 3D work'], packages: ['Packages', 'See packages'] };
 const SPEC_WORK = { commercials: ['airport', 'zebra_scheduling', 'jiffy_hook', 'zebra_inventory', 'jiffy_starborn', 'zebra_timekeeping', 0, 0], ui: ['zebra_inventory', 'zebra_timekeeping', 'zebra_scheduling', 'jiffy_hook', 'jiffy_starborn', 0, 0, 0], '3d': ['airport', 0, 0, 0, 0, 0, 0, 0], packages: ['airport', 'zebra_inventory', 'jiffy_hook', 'jiffy_starborn', 0, 0, 0, 0] };
@@ -78,32 +80,39 @@ function farPalm(bx, gy, PH) {
   }
   return out;
 }
-let TOP = 'curve';
+let TOP = 'curve', WORD = 'line';
+const FONTS = { script: 'Sacramento', brush: 'Yellowtail' };
+// fits the script word to the room it has: returns font size, the height of its tall letters and where its baseline sits in the line box
+function scriptFit(avail, maxFs) {
+  const c = document.createElement('canvas').getContext('2d'); c.font = `100px "${FONTS[WORD]}", cursive`; const m = c.measureText('Motion');
+  const fs = Math.min(avail / (m.width + 6) * 100, maxFs), A = (m.fontBoundingBoxAscent || 90) * fs / 100, Dn = (m.fontBoundingBoxDescent || 35) * fs / 100;
+  return { fs, cap: (m.actualBoundingBoxAscent || 70) * fs / 100, base: (fs - (A + Dn)) / 2 + A, w: m.width * fs / 100 };
+}
 function hero(play) {
   const st = $('#stage'); if (!st) return;
   const svg = $('svg', st), light = $('.light', st), sub = $('.sub', st), reel = $('.reel', st);
   const W = st.clientWidth, ph = W < 700, gx = px('--gx'), x0 = gx + px('--lane'), V = TOP;
   // the hero fills the first screen: reel top left, the word under it on the line, one drawing on the right.
   // zone = the box the drawing gets: from xs (where it leaves the ground) to the right edge, from yTop down to the ground gy
-  let Hh, gy, h, wy, rw, ry, xs, yTop, wAv, PH, R, fil, lean, bx, k;
+  let Hh, gy, h, wy, rw, ry, xs, yTop, wAv, PH, R, fil, lean, bx, k, SF = null; const SC = WORD !== 'line', sc = $('.script', st);
   const palmDims = hgt => { PH = hgt; R = PH * .207; fil = PH * .104; lean = PH * .063 };
   if (!ph) {
     Hh = Math.round(clamp(innerHeight, 600, 960)); gy = Hh - 132; yTop = 100;
     if (V === 'palm') { palmDims(Math.min(640, (gy - 96) / 1.16)); bx = Math.min(W * .875, W - 1.8 * R - 8); wAv = bx - lean - 1.75 * R - 70 - x0 }
     else if (V === 'wave') { k = Math.min((gy - yTop - 10) / 605, W * .4 / 1046); xs = W - 70 - 1046 * k; wAv = xs - 50 - x0 }
     else if (V === 'sun') { R = Math.min(132, (gy - yTop) * .27); xs = W * .8; wAv = xs - R - 90 - x0 } else { xs = W * .64; wAv = xs - 56 - x0 }
-    h = clamp(wAv / 6.26, 34, 128); wy = gy;
+    h = clamp(wAv / 6.26, 34, 128); wy = gy; if (SC) { SF = scriptFit(wAv, 300); h = SF.cap }
     const hAv = gy - h - 40 - 104; rw = Math.max(260, Math.min(wAv, hAv * 16 / 9)); ry = gy - h - 40 - rw * 9 / 16;
   } else {
     rw = W - x0 - 16; ry = 84; yTop = ry + rw * 9 / 16 + 30; gy = yTop + 232;
     if (V === 'palm') { palmDims((gy - yTop) / 1.16); bx = W * .64 } else if (V === 'wave') { k = Math.min(206 / 605, W * .7 / 1046); xs = W - 26 - 1046 * k } else if (V === 'sun') { R = 62; xs = W * .64 } else xs = W * .3;
-    h = Math.min(64, (W - x0 - 18) / 6.26); wy = gy + 52 + h; Hh = Math.round(wy + 104);
+    h = Math.min(64, (W - x0 - 18) / 6.26); if (SC) { SF = scriptFit(W - x0 - 22, 150); h = SF.cap } wy = gy + 52 + h; Hh = Math.round(wy + 104);
   }
   if (reel) { reel.style.left = x0 + 'px'; reel.style.top = ry + 'px'; reel.style.width = rw + 'px' }
   st.classList.add('lit');
   st.style.height = Hh + 'px'; svg.setAttribute('viewBox', `0 0 ${W} ${Hh}`); st.style.setProperty('--hw', (ph ? 2 : clamp(W / 560, 2.2, 2.8)) + 'px');
   st.closest('[data-g]').style.setProperty('--tt', gy + 'px');
-  sub.style.left = x0 + 'px'; sub.style.top = (ph ? wy + 20 : gy + 26) + 'px';
+  sub.style.left = x0 + 'px'; sub.style.top = (ph ? wy + 20 : gy + 26) + (SC ? SF.fs * (WORD === 'brush' ? .13 : .05) : 0) + 'px';
   const wEnd = x0 + 6.26 * h;
   let stem, fr = [], fan = null, tilt = 0, far = '', extra = '', sunMk = '', guides = [], end, tips = false;
   st.dataset.top = V;
@@ -149,7 +158,8 @@ function hero(play) {
   const mk = pts => { const q = el('path', { class: 'h', d: D(pts) }, svg); q._len = q.getTotalLength(); return q };
   const S = { W, ph, gx, gy, light, guide, reel, xtra: $('.xtra', svg), stem: mk(stem), fr: fr.map(mk), tips: tips ? fr.map(f => el('circle', { class: 'f', cx: f[72][0], cy: f[72][1], r: 0 }, svg)) : [], ride: tips, node: el('circle', { class: 'f', cx: gx, cy: gy, r: 0 }, svg) };
   S.sun = $('.sunf', svg); S.sunR = R;
-  S.let = letters(x0, wy, h).map(l => ({ cx: l.cx, t0: null, p: l.strokes.map(mk) })); S.fan = fan; S.tilt = tilt; S.box = [wy - h, wy, h]; S.st = st;
+  S.let = SC ? [] : letters(x0, wy, h).map(l => ({ cx: l.cx, t0: null, p: l.strokes.map(mk) }));
+  if (sc) { sc.hidden = !SC; if (SC) { sc.style.fontFamily = `"${FONTS[WORD]}", cursive`; sc.style.fontSize = SF.fs + 'px'; sc.style.left = x0 + 'px'; sc.style.top = (wy - SF.base + (WORD === 'brush' ? SF.fs * .02 : SF.fs * .035)) + 'px'; S.sc = sc; S.scX = x0; S.scW = SF.w } } S.fan = fan; S.tilt = tilt; S.box = [wy - h, wy, h]; S.st = st;
   S.Ts = ph ? 1.8 : 2.5; S.tF = .3 + S.Ts - .14; S.tL = S.tF + .7; S.end = (ph ? S.tL + 5 * .08 + .9 : S.tF + 2.1);
   if (H && H.raf) cancelAnimationFrame(H.raf);
   H = S;
@@ -174,6 +184,7 @@ function frame(S, t) {
   S.light.style.transform = `translate(${pos.x.toFixed(1)}px,${pos.y.toFixed(1)}px) scale(${pulse.toFixed(3)})`;
   S.light.style.opacity = t < .3 ? 0 : 1;
   S.guide.style.opacity = all ? 0 : 1 - clamp((t - S.tF - .5) / .6);
+  if (S.sc) S.sc.style.setProperty('--wv', all ? 1 : S.ph ? easeIO(clamp((t - S.tL) / 1.3)).toFixed(3) : clamp((d - S.scX - 20) / S.scW).toFixed(3));
   if (S.reel) S.reel.style.setProperty('--rv', all ? 1 : easeIO(clamp((t - .55) / 1.5)).toFixed(3));
 }
 
@@ -279,8 +290,8 @@ function way() {
   else yEnd = END != null ? last.offsetTop + END : last.offsetTop + last.offsetHeight;
   const main = d + `L${x} ${yEnd}`, full = main + tail;
   const marks = hs.map(h => `<path class="hb" d="M${h[0]} ${h[1]}L${h[2]} ${h[3]}"/><circle class="hk" cx="${h[2]}" cy="${h[3]}" r="3"/><path class="f" d="M${h[0]} ${h[1] - 6}l6 6-6 6-6-6z"/>`).join('');
-  svg.innerHTML = '<defs>' + ['black', 'night', 'terra', 'tan', 'paper'].map(g => `<clipPath id="wc-${g}">${secs.filter(s => s.dataset.ground === g).map(s => `<rect x="-40" y="${s.offsetTop}" width="${W + 80}" height="${s.offsetHeight}"/>`).join('')}</clipPath>`).join('') + '</defs>'
-    + ['black', 'night', 'terra', 'tan', 'paper'].map(g => `<g data-ground="${g}" clip-path="url(#wc-${g})"><path class="dots" d="${full}"/>${marks}<path class="s sol" d="${full}"/></g>`).join('')
+  svg.innerHTML = '<defs>' + ['black', 'night', 'sea', 'terra', 'tan', 'paper'].map(g => `<clipPath id="wc-${g}">${secs.filter(s => s.dataset.ground === g).map(s => `<rect x="-40" y="${s.offsetTop}" width="${W + 80}" height="${s.offsetHeight}"/>`).join('')}</clipPath>`).join('') + '</defs>'
+    + ['black', 'night', 'sea', 'terra', 'tan', 'paper'].map(g => `<g data-ground="${g}" clip-path="url(#wc-${g})"><path class="dots" d="${full}"/>${marks}<path class="s sol" d="${full}"/></g>`).join('')
     + `<g id="spray" data-ground="black"></g><g id="rider" data-ground="black"><path class="f bd" d="${D(boardPts(46))}Z"/></g>`;
   const m = el('path', { d: main }), f = $('.sol', svg), lenMain = m.getTotalLength(), len = f.getTotalLength(), step = 3, ys = [];
   for (let l = 0; l <= lenMain; l += step) ys.push(f.getPointAtLength(l).y);
@@ -369,11 +380,16 @@ function init() {
   $$('[data-work]').forEach(w => w.innerHTML = w.dataset.work.split(',').map(s => { const [k, c] = s.split(':'); return piece(k, c) }).join(''));
   $$('[data-doors]').forEach(w => w.innerHTML = w.dataset.doors.split(',').map(k => door(k, 'specialty.html#' + k)).join(''));
   specialty();
+  $$('.bar .name').forEach(a => { a.innerHTML = logoSvg(phone() ? 40 : 46) + '<span class="sr">Amigo Animation, home</span>'; a.setAttribute('aria-label', 'Amigo Animation, home') });
   let m = 'dusk'; try { m = localStorage.getItem('amigo-b-ground2') || m } catch (e) { }
   $$('.grounds button[data-m]').forEach(b => b.addEventListener('click', () => ground(b.dataset.m)));
   try { TOP = localStorage.getItem('amigo-b-top') || TOP } catch (e) { } if (!['curve', 'wave', 'sun'].includes(TOP)) TOP = 'curve';
   const setTop = (v, go) => { TOP = v; $$('.grounds button[data-v]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); try { localStorage.setItem('amigo-b-top', v) } catch (e) { } if (go) { scrollTo(0, 0); hero(true); way(); tick() } };
   $$('.grounds button[data-v]').forEach(b => b.addEventListener('click', () => setTop(b.dataset.v, true))); setTop(TOP, false);
+  try { WORD = localStorage.getItem('amigo-b-word') || WORD } catch (e) { } if (!['line', 'script', 'brush'].includes(WORD)) WORD = 'line';
+  const setWord = (v, go) => { WORD = v; $$('.grounds button[data-w]').forEach(b => b.setAttribute('aria-pressed', b.dataset.w === v)); try { localStorage.setItem('amigo-b-word', v) } catch (e) { } if (go) { const run = () => { scrollTo(0, 0); hero(true); way(); tick() }; v !== 'line' && document.fonts && document.fonts.load ? document.fonts.load(`100px "${FONTS[v]}"`, 'Motion').then(run, run) : run() } };
+  $$('.grounds button[data-w]').forEach(b => b.addEventListener('click', () => setWord(b.dataset.w, true))); setWord(WORD, false);
+  const ob = $('.optbtn'); if (ob) ob.addEventListener('click', () => { const on = document.body.classList.toggle('opts'); ob.setAttribute('aria-expanded', on); ob.textContent = on ? 'Close' : 'Options' });
   let PH0 = 'studio'; try { PH0 = localStorage.getItem('amigo-b-photo') || PH0 } catch (e) { }
   const setPhoto = v => { const w = $('.wall'); if (w) { w.dataset.p = v; w.style.backgroundImage = v === 'off' ? 'none' : `url(assets/${v}.jpg)` } $$('.grounds button[data-p]').forEach(b => b.setAttribute('aria-pressed', b.dataset.p === v)); try { localStorage.setItem('amigo-b-photo', v) } catch (e) { } };
   $$('.grounds button[data-p]').forEach(b => b.addEventListener('click', () => setPhoto(b.dataset.p))); setPhoto(PH0);
@@ -390,7 +406,7 @@ function init() {
   let q = false; addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(() => { q = false; tick() }) } }, { passive: true });
   addEventListener('load', () => { fit(); way(); tick() });
   addEventListener('hashchange', () => { if ($('#spec')) { specialty(); ground(document.querySelector('.grounds button[data-m][aria-pressed="true"]').dataset.m); layout(false); wire() } });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fit(); way(); tick() });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (WORD !== 'line') { const go = () => layout(false); document.fonts.load(`100px "${FONTS[WORD]}"`, 'Motion').then(go, go) } else { fit(); way(); tick() } });
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
