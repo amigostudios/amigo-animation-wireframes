@@ -412,9 +412,6 @@ function endcap() { const cap = $('.endcap'); if (!cap) return; const h = $('.hd
 function layout(play) { branches(); hero(play); horizon(); endcap(); fit(); way(); tick() }
 function init() {
   const cl = $('#clients'); if (cl && window.AM_LOGOS) cl.innerHTML = CLIENTS.map(k => { const l = AM_LOGOS[k]; if (!l) return ''; const w = Math.round((phone() ? 40 : 50) * Math.pow(l.w / l.h, .62)); return `<span title="${l.name}"><svg role="img" aria-label="${l.name}" width="${w}" height="${Math.round(w * l.h / l.w)}" viewBox="0 0 ${l.w} ${l.h}"><path transform="${l.t}" d="${l.d}"/></svg></span>` }).join('');
-  // sand under the clients: the underwater-sand clip from the amigosd.com text texture, faint, plays only while on screen (no blend modes)
-  const cs = cl && cl.closest('section'); if (cs && !$('.sandv', cs)) { const sv = document.createElement('video'); sv.className = 'sandv'; sv.muted = true; sv.loop = true; sv.playsInline = true; sv.setAttribute('playsinline', ''); sv.setAttribute('aria-hidden', 'true'); sv.preload = 'metadata'; sv.poster = 'assets/clips/sand.jpg'; sv.src = 'assets/clips/sand.mp4'; cs.insertBefore(sv, cs.firstChild);
-    if (!RM && 'IntersectionObserver' in window) new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? sv.play().catch(() => { }) : sv.pause()), { rootMargin: '100px' }).observe(cs) }
   $$('[data-work]').forEach(w => w.innerHTML = w.dataset.work.split(',').map(s => { const [k, c] = s.split(':'); return piece(k, c) }).join(''));
   $$('[data-doors]').forEach(w => w.innerHTML = w.dataset.doors.split(',').map(k => door(k, 'specialty.html#' + k)).join(''));
   specialty();
@@ -428,8 +425,12 @@ function init() {
   const setWord = (v, go) => { WORD = v; $$('.grounds button[data-w]').forEach(b => b.setAttribute('aria-pressed', b.dataset.w === v)); try { localStorage.setItem('amigo-b-word', v) } catch (e) { } if (go) { const run = () => { scrollTo(0, 0); hero(true); way(); tick() }; v !== 'line' && document.fonts && document.fonts.load ? document.fonts.load(`100px "${FONTS[v]}"`, 'Motion').then(run, run) : run() } };
   $$('.grounds button[data-w]').forEach(b => b.addEventListener('click', () => setWord(b.dataset.w, true))); setWord(WORD, false);
   const ob = $('.optbtn'); if (ob) ob.addEventListener('click', () => { const on = document.body.classList.toggle('opts'); ob.setAttribute('aria-expanded', on); ob.textContent = on ? 'Close' : 'Options' });
-  let PH0 = 'studio'; try { PH0 = localStorage.getItem('amigo-b-photo') || PH0 } catch (e) { }
-  const setPhoto = v => { const w = $('.wall'); if (w) { w.dataset.p = v; w.style.backgroundImage = v === 'off' ? 'none' : `url(assets/${v}.jpg)` } $$('.grounds button[data-p]').forEach(b => b.setAttribute('aria-pressed', b.dataset.p === v)); try { localStorage.setItem('amigo-b-photo', v) } catch (e) { } };
+  // header: the underwater-sand clip (amigosd.com text texture) replaced the studio photo 11-25; new key so everyone starts on Sand
+  let PH0 = 'sand'; try { PH0 = localStorage.getItem('amigo-b-photo2') || PH0 } catch (e) { } if (!['sand', 'water', 'off'].includes(PH0)) PH0 = 'sand';
+  const setPhoto = v => { const w = $('.wall'); if (w) { w.dataset.p = v; w.style.backgroundImage = v === 'off' || v === 'sand' ? 'none' : `url(assets/${v}.jpg)`;
+      let sv = $('.wallv'); if (v === 'sand' && !sv) { sv = document.createElement('video'); sv.className = 'wallv'; sv.muted = true; sv.loop = true; sv.playsInline = true; sv.setAttribute('playsinline', ''); sv.setAttribute('aria-hidden', 'true'); sv.preload = 'auto'; sv.poster = 'assets/clips/sand.jpg'; sv.src = 'assets/clips/sand.mp4'; w.parentNode.insertBefore(sv, w);
+        if (!RM && 'IntersectionObserver' in window) new IntersectionObserver(es => es.forEach(e => { if (sv.hidden) return; e.isIntersecting ? sv.play().catch(() => { }) : sv.pause() })).observe(w.parentNode) }
+      if (sv) { sv.hidden = v !== 'sand'; if (sv.hidden) sv.pause(); else if (!RM) sv.play().catch(() => { }) } } $$('.grounds button[data-p]').forEach(b => b.setAttribute('aria-pressed', b.dataset.p === v)); try { localStorage.setItem('amigo-b-photo2', v) } catch (e) { } };
   $$('.grounds button[data-p]').forEach(b => b.addEventListener('click', () => setPhoto(b.dataset.p))); setPhoto(PH0);
   ground(m); wake(); layout(true); wire(); live(); glows();
   const reel = $('.reel'); if (reel) {
