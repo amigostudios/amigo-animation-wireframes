@@ -94,7 +94,7 @@ function hero(play) {
   const W = st.clientWidth, ph = W < 700, gx = px('--gx'), x0 = gx + px('--lane'), V = TOP;
   // the hero fills the first screen: reel top left, the word under it on the line, one drawing on the right.
   // zone = the box the drawing gets: from xs (where it leaves the ground) to the right edge, from yTop down to the ground gy
-  let Hh, gy, h, wy, rw, ry, xs, yTop, wAv, PH, R, fil, lean, bx, k, SF = null; const SC = WORD !== 'line', sc = $('.script', st);
+  let Hh, gy, h, wy, rw, ry, rx = x0, xs, yTop, wAv, PH, R, fil, lean, bx, k, SF = null; const SC = WORD !== 'line', sc = $('.script', st);
   const palmDims = hgt => { PH = hgt; R = PH * .207; fil = PH * .104; lean = PH * .063 };
   if (!ph) {
     Hh = Math.round(clamp(innerHeight, 600, 960)); gy = Hh - 132; yTop = 100;
@@ -102,17 +102,19 @@ function hero(play) {
     else if (V === 'wave') { k = Math.min((gy - yTop - 10) / 605, W * .4 / 1046); xs = W - 70 - 1046 * k; wAv = xs - 50 - x0 }
     else if (V === 'sun') { R = Math.min(132, (gy - yTop) * .27); xs = W * .8; wAv = xs - R - 90 - x0 } else { xs = W * .64; wAv = xs - 56 - x0 }
     h = clamp(wAv / 6.26, 34, 128); wy = gy; if (SC) { SF = scriptFit(wAv, 300); h = SF.cap }
+    const BIG = V !== 'wave' && !SC; if (BIG) h = clamp(W * .05, 40, 76);
     const hAv = gy - h - 40 - 104; rw = Math.max(260, Math.min(wAv, hAv * 16 / 9)); ry = gy - h - 40 - rw * 9 / 16;
+    if (BIG) { const top = 92, hA = gy - h - 34 - top; rw = Math.max(260, Math.min(W - 2 * x0 - 200, hA * 16 / 9)); rx = (W - rw) / 2; ry = top + (hA - rw * 9 / 16) / 2; const mg = W - rx - rw; if (V === 'sun') { R = Math.min(84, mg * .36); xs = rx + rw + mg / 2 } else xs = rx + rw + Math.min(40, mg * .2) }
   } else {
     rw = W - x0 - 16; ry = 84; yTop = ry + rw * 9 / 16 + 30; gy = yTop + 232;
     if (V === 'palm') { palmDims((gy - yTop) / 1.16); bx = W * .64 } else if (V === 'wave') { k = Math.min(206 / 605, W * .7 / 1046); xs = W - 26 - 1046 * k } else if (V === 'sun') { R = 62; xs = W * .64 } else xs = W * .3;
     h = Math.min(64, (W - x0 - 18) / 6.26); if (SC) { SF = scriptFit(W - x0 - 22, 150); h = SF.cap } wy = gy + 52 + h; Hh = Math.round(wy + 104);
   }
-  if (reel) { reel.style.left = x0 + 'px'; reel.style.top = ry + 'px'; reel.style.width = rw + 'px' }
+  if (reel) { reel.style.left = rx + 'px'; reel.style.top = ry + 'px'; reel.style.width = rw + 'px' }
   st.classList.add('lit');
   st.style.height = Hh + 'px'; svg.setAttribute('viewBox', `0 0 ${W} ${Hh}`); st.style.setProperty('--hw', (ph ? 2 : clamp(W / 560, 2.2, 2.8)) + 'px');
   st.closest('[data-g]').style.setProperty('--tt', gy + 'px');
-  sub.style.left = x0 + 'px'; sub.style.top = (ph ? wy + 20 : gy + 26) + (SC ? SF.fs * (WORD === 'brush' ? .13 : .05) : 0) + 'px';
+  sub.style.left = (ph ? x0 : rx) + 'px'; sub.style.top = (ph ? wy + 20 : gy + 26) + (SC ? SF.fs * (WORD === 'brush' ? .13 : .05) : 0) + 'px';
   const wEnd = x0 + 6.26 * h;
   let stem, fr = [], fan = null, tilt = 0, far = '', extra = '', sunMk = '', guides = [], end, tips = false;
   st.dataset.top = V;
@@ -146,7 +148,7 @@ function hero(play) {
     extra = [[20, .62, .9], [40, .38, .6], [60, .16, .35]].map(([dy, hw, o]) => `<path class="tick" style="opacity:${o}" d="M${xs - R * hw} ${gy + dy}H${xs + R * hw}"/>`).join('');
   } else {
     // the ease curve (style frame Q1): the line leaves the ground at one keyframe and eases up to the next. Handles are the true control points
-    const P0 = [xs, gy], P3 = [W - (ph ? 34 : 84), yTop + (ph ? 26 : 56)], dx = P3[0] - P0[0], c1 = [P0[0] + dx * .62, P0[1]], c2 = [P3[0] - dx * .62, P3[1]], bz = [];
+    const P0 = [xs, gy], P3 = [W - (ph ? 34 : Math.max(30, Math.min(84, (W - xs) * .3))), yTop + (ph ? 26 : 56)], dx = P3[0] - P0[0], c1 = [P0[0] + dx * .62, P0[1]], c2 = [P3[0] - dx * .62, P3[1]], bz = [];
     for (let i = 0; i <= 90; i++) { const t = i / 90, m = 1 - t; bz.push([m * m * m * P0[0] + 3 * m * m * t * c1[0] + 3 * m * t * t * c2[0] + t * t * t * P3[0], m * m * m * P0[1] + 3 * m * m * t * c1[1] + 3 * m * t * t * c2[1] + t * t * t * P3[1]]) }
     stem = [[-20, gy], ...bz]; end = P3; guides = [[P3, [W + 20, P3[1]]]];
     const dia = q => `<path class="kd" d="M${q[0]} ${q[1] - 7}l7 7-7 7-7-7z"/>`;
@@ -158,7 +160,7 @@ function hero(play) {
   const mk = pts => { const q = el('path', { class: 'h', d: D(pts) }, svg); q._len = q.getTotalLength(); return q };
   const S = { W, ph, gx, gy, light, guide, reel, xtra: $('.xtra', svg), stem: mk(stem), fr: fr.map(mk), tips: tips ? fr.map(f => el('circle', { class: 'f', cx: f[72][0], cy: f[72][1], r: 0 }, svg)) : [], ride: tips, node: el('circle', { class: 'f', cx: gx, cy: gy, r: 0 }, svg) };
   S.sun = $('.sunf', svg); S.sunR = R;
-  S.let = SC ? [] : letters(x0, wy, h).map(l => ({ cx: l.cx, t0: null, p: l.strokes.map(mk) }));
+  S.let = SC ? [] : letters(ph ? x0 : rx, wy, h).map(l => ({ cx: l.cx, t0: null, p: l.strokes.map(mk) }));
   if (sc) { sc.hidden = !SC; if (SC) { sc.style.fontFamily = `"${FONTS[WORD]}", cursive`; sc.style.fontSize = SF.fs + 'px'; sc.style.left = x0 + 'px'; sc.style.top = (wy - SF.base + (WORD === 'brush' ? SF.fs * .02 : SF.fs * .035)) + 'px'; S.sc = sc; S.scX = x0; S.scW = SF.w } } S.fan = fan; S.tilt = tilt; S.box = [wy - h, wy, h]; S.st = st;
   S.Ts = ph ? 1.8 : 2.5; S.tF = .3 + S.Ts - .14; S.tL = S.tF + .7; S.end = (ph ? S.tL + 5 * .08 + .9 : S.tF + 2.1);
   if (H && H.raf) cancelAnimationFrame(H.raf);
@@ -190,7 +192,7 @@ function frame(S, t) {
 
 /* after the drawing: the crown leans toward the cursor and breathes; a letter redraws itself when the cursor crosses it */
 function live() {
-  const st = $('#stage'); if (!st || RM) return;
+  const st = $('#stage'); if (!st || RM || COARSE) return;
   let mx = .5, my = -1, a = 0, v = 0, on = true, px0 = -1, pxs = 0, pys = 0;
   st.addEventListener('pointermove', e => { const r = st.getBoundingClientRect(); mx = (e.clientX - r.left) / r.width; px0 = e.clientX - r.left; my = e.clientY - r.top });
   st.addEventListener('pointerleave', () => { mx = .5; my = -1 });
@@ -214,7 +216,7 @@ const boardPts = (L, wd = .25, tail = .24, pw = .6) => { const a = L / 2, b = L 
 function wake() {
   const cv = $('#wake'); if (!cv) return;
   const sec = cv.closest('section'), ctx = cv.getContext('2d'), BP = boardPts(58), BP2 = boardPts(70, .34);
-  let W = 0, Hc = 0, dpr = 1, col = '#fff', bg = '#000', paper = false, hist = [], bits = [], lastT = 0, trail = [], bx = null, by = 0, ex = 0, ey = 0, ang = -.5, ptr = null, ptrT = 0, on = false;
+  let W = 0, Hc = 0, dpr = 1, col = '#fff', bg = '#000', paper = false, hist = [], bits = [], lastT = 0, ph = 0, trail = [], bx = null, by = 0, ex = 0, ey = 0, ang = -.5, ptr = null, ptrT = 0, on = false;
   const size = () => { dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; Hc = cv.clientHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(Hc * dpr); const cs = getComputedStyle(sec); col = cs.color; bg = cs.backgroundColor; paper = sec.dataset.ground === 'paper' || sec.dataset.ground === 'tan'; if (RM) draw(0) };
   sec.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); ptr = [clamp(e.clientX - r.left, W * .12, W - 20), clamp(e.clientY - r.top, 20, Hc - 20)]; ptrT = performance.now() });
   sec.addEventListener('pointerleave', () => { ptr = null });
@@ -238,13 +240,22 @@ function wake() {
   }
   const loop = now => {
     requestAnimationFrame(loop); if (!on || !W) return;
-    const t = now / 1000, live = ptr && now - ptrT < 3500, tx = live ? ptr[0] : W * (.56 + .3 * Math.sin(t * .21)), ty = live ? ptr[1] : Hc * (.5 + .28 * Math.sin(t * .33 + 1));
-    if (bx == null) { bx = ex = tx; by = ey = ty }
-    const ox = bx, oy = by; bx += (tx - bx) * .032; by += (ty - by) * .032;
-    const vx = bx - ox, vy = by - oy, sp = Math.hypot(vx, vy);
-    const dt = Math.min(.05, t - lastT || .016); lastT = t;
-    if (sp > .25) { let d = Math.atan2(vy, vx) - ang; d = Math.atan2(Math.sin(d), Math.cos(d)); ang += d * .07;
-      if (Math.abs(d) > .3 && sp > .7 && bits.length < 60) { const sd = -Math.sign(d), c = Math.cos(ang), n = Math.sin(ang), v0 = 40 + sp * 26; for (let i = 0; i < 2; i++) { const r = Math.random(); bits.push({ x: bx - c * 28, y: by - n * 28, vx: (-n * sd * (.5 + r) - c * .4) * v0, vy: (c * sd * (.5 + r) - n * .4) * v0, r: .9 + r * 1.4, t: 0, life: .5 + r * .5 }) } } }
+    const t = now / 1000, live = ptr && now - ptrT < 3500, dt = Math.min(.05, t - lastT || .016); lastT = t;
+    if (bx == null) { bx = ex = W * .6; by = ey = Hc * .5 }
+    let turn = 0, sp = 0;
+    if (live) {                                           // follows the cursor
+      const ox = bx, oy = by; bx += (ptr[0] - bx) * .032; by += (ptr[1] - by) * .032; const vx = bx - ox, vy = by - oy; sp = Math.hypot(vx, vy);
+      if (sp > .25) { let d = Math.atan2(vy, vx) - ang; d = Math.atan2(Math.sin(d), Math.cos(d)); ang += d * .07; if (Math.abs(d) > .3 && sp > .7) turn = d }
+    } else {                                              // surfs by itself: long carving arcs that snap into cutbacks, one after another
+      const T = 3.3 + .7 * Math.sin(t * .13); ph += dt * 6.2832 / T;
+      const sn = Math.sin(ph), carve = Math.tanh(2.6 * sn), snap = Math.pow(Math.abs(sn), 6) * Math.sign(sn);   // carve = the arc, snap = the hard part of the turn at its peak
+      let om = 1.25 * carve + 2.3 * snap;
+      const dx = W * .56 - bx, dy = Hc * .5 - by, far = Math.max(0, Math.hypot(dx / (W * .33), dy / (Hc * .36)) - 1);
+      if (far > 0) { let e = Math.atan2(dy, dx) - ang; e = Math.atan2(Math.sin(e), Math.cos(e)); om += Math.min(3.5, far * 5) * e }   // near an edge it leans back toward open water
+      ang += om * dt; const v = (W < 500 ? 105 : 165) * (1 - .34 * Math.abs(snap)) * (1 + .12 * Math.cos(ph * 2));              // slows into the snap, drives out of it
+      bx += Math.cos(ang) * v * dt; by += Math.sin(ang) * v * dt; sp = v * dt; if (Math.abs(om) > 2.1) turn = om;
+    }
+    if (turn && bits.length < 70) { const sd = -Math.sign(turn), c = Math.cos(ang), n = Math.sin(ang), v0 = 40 + sp * 26; for (let i = 0; i < 2; i++) { const r = Math.random(); bits.push({ x: bx - c * 28, y: by - n * 28, vx: (-n * sd * (.5 + r) - c * .4) * v0, vy: (c * sd * (.5 + r) - n * .4) * v0, r: .9 + r * 1.4, t: 0, life: .5 + r * .5 }) } }
     bits = bits.filter(q => { q.t += dt; const kk = Math.pow(.05, dt); q.vx *= kk; q.vy *= kk; q.x += q.vx * dt; q.y += q.vy * dt; return q.t < q.life });
     hist.push([bx - Math.cos(ang) * 30, by - Math.sin(ang) * 30]); if (hist.length > 64) hist.shift();
     if (Math.hypot(bx - ex, by - ey) > 13) { ex = bx; ey = by; trail.push({ x: bx - Math.cos(ang) * 26, y: by - Math.sin(ang) * 26, nx: -Math.sin(ang), ny: Math.cos(ang), t }) }
@@ -291,11 +302,14 @@ function way() {
   const main = d + `L${x} ${yEnd}`, full = main + tail;
   const marks = hs.map(h => `<path class="hb" d="M${h[0]} ${h[1]}L${h[2]} ${h[3]}"/><circle class="hk" cx="${h[2]}" cy="${h[3]}" r="3"/><path class="f" d="M${h[0]} ${h[1] - 6}l6 6-6 6-6-6z"/>`).join('');
   svg.innerHTML = '<defs>' + ['black', 'night', 'sea', 'terra', 'tan', 'paper'].map(g => `<clipPath id="wc-${g}">${secs.filter(s => s.dataset.ground === g).map(s => `<rect x="-40" y="${s.offsetTop}" width="${W + 80}" height="${s.offsetHeight}"/>`).join('')}</clipPath>`).join('') + '</defs>'
-    + ['black', 'night', 'sea', 'terra', 'tan', 'paper'].map(g => `<g data-ground="${g}" clip-path="url(#wc-${g})"><path class="dots" d="${full}"/>${marks}<path class="s sol" d="${full}"/></g>`).join('')
-    + `<g id="spray" data-ground="black"></g><g id="rider" data-ground="black"><path class="f bd" d="${D(boardPts(46))}Z"/></g>`;
+    + ['black', 'night', 'sea', 'terra', 'tan', 'paper'].map(g => `<g data-ground="${g}" clip-path="url(#wc-${g})"><path class="dots" d="${full}"/>${marks}<path class="s sol" d="${full}"/></g>`).join('');
   const m = el('path', { d: main }), f = $('.sol', svg), lenMain = m.getTotalLength(), len = f.getTotalLength(), step = 3, ys = [];
   for (let l = 0; l <= lenMain; l += step) ys.push(f.getPointAtLength(l).y);
-  WAY = { secs, f, sols: $$('.sol', svg), rider: $('#rider', svg), spray: $('#spray', svg), lenMain, len, step, ys, y0: ys[0], yEnd }; PARTS = [];
+  let rider = $('#rider'), spr = $('#spray');
+  if (!rider) { rider = document.createElement('div'); rider.id = 'rider'; rider.dataset.ground = 'black'; rider.innerHTML = `<svg class="art" width="52" height="16" viewBox="-26 -8 52 16" aria-hidden="true"><path class="f bd" d="${D(boardPts(46))}Z"/></svg>`; page.appendChild(rider) }
+  if (!spr) { spr = el('svg', { id: 'spray', class: 'art', width: 1, height: 1, 'aria-hidden': 'true' }); spr.dataset.ground = 'black'; page.appendChild(spr) }
+  spr.innerHTML = '';
+  WAY = { secs, f, sols: $$('.sol', svg), rider, spray: spr, lenMain, len, step, ys, y0: ys[0], yEnd }; PARTS = [];
   $$('.sol', svg).forEach(p => p.style.background = 'none'); $$('#way g').forEach(g => g.style.background = 'none');
 }
 function tick() {
@@ -316,8 +330,9 @@ function spray(now) {
 function paint() {
   const w = WAY, L = clamp(cur, 0, w.len), a = w.f.getPointAtLength(Math.max(0, L - 2)), b = w.f.getPointAtLength(Math.min(w.len, L + 2)), pt = w.f.getPointAtLength(L);
   const drawn = Math.max(0, L - 30);
-  w.sols.forEach(p => { if (drawn <= 0) { p.style.visibility = 'hidden' } else { p.style.visibility = ''; p.style.strokeDasharray = drawn + ' ' + (w.len + 60) } });
-  w.rider.setAttribute('transform', `translate(${pt.x.toFixed(1)} ${pt.y.toFixed(1)}) rotate(${(Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI).toFixed(1)})`);
+  const ink = () => w.sols.forEach(p => { if (drawn <= 0) { p.style.visibility = 'hidden' } else { p.style.visibility = ''; p.style.strokeDasharray = drawn + ' ' + (w.len + 60) } });
+  if (COARSE) { clearTimeout(w.inkT); w.inkT = setTimeout(ink, 140) } else ink();
+  w.rider.style.transform = `translate3d(${pt.x.toFixed(1)}px,${pt.y.toFixed(1)}px,0) rotate(${(Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI).toFixed(1)}deg)`;
   let g = 'black'; w.secs.forEach(s => { if (pt.y >= s.offsetTop) g = s.dataset.ground }); w.rider.dataset.ground = g; w.spray.dataset.ground = g;
   // spray: when the board turns hard, dots fly off the tail on the outside of the turn
   const hd = Math.atan2(b.y - a.y, b.x - a.x), dL = L - pL; let dA = pAng == null ? 0 : hd - pAng; dA = Math.atan2(Math.sin(dA), Math.cos(dA)); pAng = hd; pL = L;

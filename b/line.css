@@ -380,3 +380,15 @@ section[data-ground]{background-blend-mode:normal}
 .risen #hz .bird path{animation:flap 1.15s ease-in-out var(--bd,0s) infinite}
 #hz .refl{opacity:var(--ro);transform-box:fill-box;transform-origin:center}
 .risen #hz .refl{animation:shimmer 3.4s ease-in-out var(--rd,0s) infinite}
+
+/* ---- v15: board + spray in their own layers ---- */
+#rider{position:absolute;left:0;top:0;width:0;height:0;z-index:3;pointer-events:none;will-change:transform;background:none}
+#rider svg{position:absolute;left:-26px;top:-8px;overflow:visible}
+#spray{position:absolute;left:0;top:0;z-index:3;pointer-events:none;overflow:visible;background:none}
+@media (pointer:coarse){.playbtn,.optbtn{-webkit-backdrop-filter:none;backdrop-filter:none} #stage .reel video{box-shadow:none}}
+
+/* faces: clipped with clip-path and sized, not transformed (iPhone let a transformed photo escape the rounded box) */
+.who .face{-webkit-clip-path:circle(50%);clip-path:circle(50%);border-radius:0}
+.who .face img{max-width:none}
+/* Austin 11-25: bird flapping and reflection shimmer looked odd. Both are still again. */
+#hz .bird,.risen #hz .bird path,.risen #hz .refl{animation:none}
