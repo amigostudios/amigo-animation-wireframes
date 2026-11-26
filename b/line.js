@@ -90,7 +90,9 @@ function scriptFit(avail, maxFs) {
   return { fs, cap: (m.actualBoundingBoxAscent || 70) * fs / 100, base: (fs - (A + Dn)) / 2 + A, w: m.width * fs / 100 };
 }
 function hero(play) {
-  const st = $('#stage'); if (!st) return;
+  const st = $('#stage');
+  // gallery version: no stage; the whole intro header is "wall" and the line leaves from its bottom edge
+  if (!st) { const hd = $('header.hero'); if (hd) hd.style.setProperty('--tt', hd.offsetHeight + 'px'); return }
   const svg = $('svg', st), light = $('.light', st), sub = $('.sub', st), reel = $('.reel', st);
   const W = st.clientWidth, ph = W < 700, gx = px('--gx'), x0 = gx + px('--lane'), V = TOP;
   // the hero fills the first screen: reel top left, the word under it on the line, one drawing on the right.
@@ -378,7 +380,8 @@ function off() { const w = WAY; return COARSE ? [w.pl - scrollX, w.pt - scrollY]
 function paint() {
   // Austin 11-25: the board doesn't take the hard turn into the horizon; it fades out at the bottom of the last vertical (the line still inks on)
   const w = WAY, L = clamp(cur, 0, w.len), Lb = Math.min(L, w.lenMain - 4), a = at(Math.max(0, Lb - 3)), b = at(Math.min(w.len, Lb + 3)), pt = at(Lb), [ox0, oy0] = off();
-  const fo = clamp((w.lenMain - 4 - L) / 90), bs = w.rider.firstChild.style; if (bs.opacity !== fo.toFixed(2)) bs.opacity = fo.toFixed(2);
+  // 11-26: it also stays hidden until you start scrolling, then fades in (it read as floating while the page sat still)
+  const fo = Math.min(clamp((w.lenMain - 4 - L) / 90), RM ? 1 : clamp((scrollY - 24) / 150)), bs = w.rider.firstChild.style; if (bs.opacity !== fo.toFixed(2)) bs.opacity = fo.toFixed(2);
   const drawn = Math.max(0, L - 30);
   const ink = () => w.sols.forEach(p => { if (drawn <= 0) { p.style.visibility = 'hidden' } else { p.style.visibility = ''; p.style.strokeDasharray = drawn + ' ' + (w.len + 60) } });
   if (COARSE) { clearTimeout(w.inkT); w.inkT = setTimeout(ink, 140) } else ink();
@@ -427,21 +430,52 @@ function glows() {
   const run = () => { raf = 0; if (!sec) return; const c = sec._g || (sec._g = [tx, ty]); c[0] += (tx - c[0]) * .08; c[1] += (ty - c[1]) * .08; sec.style.setProperty('--bx', c[0].toFixed(1) + '%'); sec.style.setProperty('--by', c[1].toFixed(1) + '%'); if (Math.abs(tx - c[0]) + Math.abs(ty - c[1]) > .15) raf = requestAnimationFrame(run) };
   addEventListener('pointermove', e => { const s = e.target.closest && e.target.closest('.page [data-g]'); if (!s) return; const r = s.getBoundingClientRect(); sec = s; tx = (e.clientX - r.left) / r.width * 100; ty = (e.clientY - r.top) / r.height * 100; if (!raf) raf = requestAnimationFrame(run) }, { passive: true });
 }
+// the viewer: tap/click a piece to watch it big, with sound and controls; arrows, swipe and Esc
+function viewer(i) {
+  const list = $$('.piece[data-clip]'); if (!list.length) return;
+  let V = $('.viewer');
+  if (!V) {
+    V = document.createElement('div'); V.className = 'viewer'; V.setAttribute('role', 'dialog'); V.setAttribute('aria-modal', 'true'); V.setAttribute('aria-label', 'Work viewer');
+    V.innerHTML = `<button class="vx" type="button" aria-label="Close">Close</button><div class="vstage"><video playsinline controls loop preload="auto"></video></div><div class="vbar"><button class="vp" type="button" aria-label="Previous piece">${ARROW}</button><div class="vlab"><b></b><span></span><small></small></div><button class="vn" type="button" aria-label="Next piece">${ARROW}</button></div>`;
+    document.body.appendChild(V);
+    const close = () => { const v = $('video', V); v.pause(); v.removeAttribute('src'); v.load(); V.classList.remove('on'); document.documentElement.classList.remove('vlock'); if (V._from) V._from.focus({ preventScroll: true }) };
+    $('.vx', V).addEventListener('click', close); V.addEventListener('click', e => { if (e.target === V || e.target.classList.contains('vstage')) close() });
+    $('.vp', V).addEventListener('click', () => viewer(V._i - 1)); $('.vn', V).addEventListener('click', () => viewer(V._i + 1));
+    addEventListener('keydown', e => { if (!V.classList.contains('on')) return; if (e.key === 'Escape') close(); if (e.key === 'ArrowLeft') viewer(V._i - 1); if (e.key === 'ArrowRight') viewer(V._i + 1) });
+    let sx = null, sy = 0; V.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY }, { passive: true });
+    V.addEventListener('touchend', e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; sx = null; if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) viewer(V._i + (dx < 0 ? 1 : -1)); else if (dy > 90 && Math.abs(dy) > Math.abs(dx) * 1.4) close() }, { passive: true });
+  }
+  const n = list.length; i = ((i % n) + n) % n; V._i = i; const a = list[i], key = a.dataset.clip, w = WORK[key];
+  if (!V.classList.contains('on')) V._from = a;
+  $$('.piece.playing').forEach(p => p._go && p._go(false));
+  const v = $('video', V); v.poster = `assets/clips/${key}.jpg`; v.src = `assets/clips/${key}.mp4`; v.muted = false; v.currentTime = 0;
+  v.play().catch(() => { v.muted = true; v.play().catch(() => { }) });
+  $('.vlab b', V).textContent = w ? w[0] : ''; $('.vlab span', V).textContent = w ? w[1] : ''; $('.vlab small', V).textContent = `${i + 1} / ${n}`;
+  V.classList.add('on'); document.documentElement.classList.add('vlock'); $('.vx', V).focus({ preventScroll: true });
+}
 function wire() {
   const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target) } }), { threshold: .12, rootMargin: '0px 0px -6% 0px' });
   $$('[data-in]').forEach(e => { if (!e._o) { e._o = 1; obs.observe(e) } });
   $$('.piece[data-clip]').forEach(a => {
     if (a._w) return; a._w = 1; const v = $('video', a);
     const go = on => { if (on) { if (!v.src) v.src = `assets/clips/${a.dataset.clip}.mp4`; v.play().then(() => a.classList.add('playing')).catch(() => { }) } else { v.pause(); a.classList.remove('playing') } };
-    a.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') go(true) }); a.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') go(false) });
-    a.addEventListener('click', e => { e.preventDefault(); if (!matchMedia('(hover:hover)').matches) go(!a.classList.contains('playing')) });
+    if (!$('.gal')) { a.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') go(true) }); a.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') go(false) }) }
+    a.addEventListener('click', e => { e.preventDefault(); viewer($$('.piece[data-clip]').indexOf(a)) });
+    a._go = go;
   });
+  // touch screens: no hover, so the card that is mostly on screen plays by itself (one at a time)
+  // gallery version: every tile on screen plays (it is the showreel), on any device
+  const GAL = !!$('.gal');
+  if ((GAL || !matchMedia('(hover:hover)').matches) && !RM && !wire._io) {
+    wire._io = new IntersectionObserver(es => es.forEach(e => { const a = e.target; if (e.intersectionRatio >= (GAL ? .35 : .6)) { if (!GAL) $$('.piece.playing').forEach(p => p !== a && p._go && p._go(false)); a._go(true) } else if (a.classList.contains('playing')) a._go(false) }), { threshold: [0, .35, .6, 1] });
+    $$('.piece[data-clip]').forEach(a => wire._io.observe(a));
+  }
   $$('.piece:not([data-clip])').forEach(a => a.addEventListener('click', e => e.preventDefault()));
 }
 function endcap() { const cap = $('.endcap'); if (!cap) return; const h = $('.hd', cap), r = parseFloat(h.style.getPropertyValue('--br')) || 14; END = h.offsetTop + .6 * parseFloat(getComputedStyle(h).fontSize) - r }
 function layout(play) { branches(); hero(play); horizon(); endcap(); fit(); way(); tick() }
 function init() {
-  const cl = $('#clients'); if (cl && window.AM_LOGOS) cl.innerHTML = CLIENTS.map(k => { const l = AM_LOGOS[k]; if (!l) return ''; const w = Math.round((phone() ? 40 : 50) * Math.pow(l.w / l.h, .62)); return `<span title="${l.name}"><svg role="img" aria-label="${l.name}" width="${w}" height="${Math.round(w * l.h / l.w)}" viewBox="0 0 ${l.w} ${l.h}"><path transform="${l.t}" d="${l.d}"/></svg></span>` }).join('');
+  const cl = $('#clients'), mini = cl && cl.classList.contains('mini'); if (cl && window.AM_LOGOS) cl.innerHTML = CLIENTS.slice(0, +(cl.dataset.n || 99)).map(k => { const l = AM_LOGOS[k]; if (!l) return ''; const w = Math.round((mini ? (phone() ? 24 : 30) : (phone() ? 40 : 50)) * Math.pow(l.w / l.h, .62)); return `<span title="${l.name}"><svg role="img" aria-label="${l.name}" width="${w}" height="${Math.round(w * l.h / l.w)}" viewBox="0 0 ${l.w} ${l.h}"><path transform="${l.t}" d="${l.d}"/></svg></span>` }).join('');
   // the underwater-sand clip (amigosd.com text texture) behind the client logos, faint, plays only while on screen (no blend modes)
   const cs = cl && cl.closest('section'); if (cs && !$('.sandv', cs)) { const sv = document.createElement('video'); sv.className = 'sandv'; sv.muted = true; sv.loop = true; sv.playsInline = true; sv.setAttribute('playsinline', ''); sv.setAttribute('aria-hidden', 'true'); sv.preload = 'metadata'; sv.poster = 'assets/clips/sand.jpg'; sv.src = 'assets/clips/sand.mp4'; cs.insertBefore(sv, cs.firstChild);
     if (!RM && 'IntersectionObserver' in window) new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? sv.play().catch(() => { }) : sv.pause()), { rootMargin: '100px' }).observe(cs) }
@@ -457,6 +491,10 @@ function init() {
   try { WORD = localStorage.getItem('amigo-b-word') || WORD } catch (e) { } WORD = 'oaxaca'; // 11-25: Austin moved MOTION from the line-drawn word to Oaxaca (brand face) with a rise-up reveal; line/script code kept for reference
   const setWord = (v, go) => { WORD = v; $$('.grounds button[data-w]').forEach(b => b.setAttribute('aria-pressed', b.dataset.w === v)); try { localStorage.setItem('amigo-b-word', v) } catch (e) { } if (go) { const run = () => { scrollTo(0, 0); hero(true); way(); tick() }; v !== 'line' && document.fonts && document.fonts.load ? document.fonts.load(`100px "${FONTS[v]}"`, 'Motion').then(run, run) : run() } };
   $$('.grounds button[data-w]').forEach(b => b.addEventListener('click', () => setWord(b.dataset.w, true))); setWord(WORD, false);
+  // review-only: switch between the reel version and the gallery version
+  $$('.grounds [data-href]').forEach(b => { b.setAttribute('aria-pressed', location.pathname.endsWith(b.dataset.href) || (b.dataset.href === 'index.html' && /\/$/.test(location.pathname))); b.addEventListener('click', () => { location.href = b.dataset.href }) });
+  // gallery intro word: the letters rise in one after another
+  $$('.gword').forEach(h => { if (h._s) return; h._s = 1; h.innerHTML = [...h.textContent.trim()].map((c, i) => `<i style="--i:${i}">${c}</i>`).join('') });
   const ob = $('.optbtn'); if (ob) ob.addEventListener('click', () => { const on = document.body.classList.toggle('opts'); ob.setAttribute('aria-expanded', on); ob.textContent = on ? 'Close' : 'Options' });
   // header: Austin went back to the studio photo 11-25 (sand clip kept as an option), now with scroll parallax; new key so everyone starts on Studio
   let PH0 = 'studio'; try { PH0 = localStorage.getItem('amigo-b-photo3') || PH0 } catch (e) { } if (!['studio', 'sand', 'water', 'off'].includes(PH0)) PH0 = 'studio';
