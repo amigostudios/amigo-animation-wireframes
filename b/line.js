@@ -412,6 +412,9 @@ function endcap() { const cap = $('.endcap'); if (!cap) return; const h = $('.hd
 function layout(play) { branches(); hero(play); horizon(); endcap(); fit(); way(); tick() }
 function init() {
   const cl = $('#clients'); if (cl && window.AM_LOGOS) cl.innerHTML = CLIENTS.map(k => { const l = AM_LOGOS[k]; if (!l) return ''; const w = Math.round((phone() ? 40 : 50) * Math.pow(l.w / l.h, .62)); return `<span title="${l.name}"><svg role="img" aria-label="${l.name}" width="${w}" height="${Math.round(w * l.h / l.w)}" viewBox="0 0 ${l.w} ${l.h}"><path transform="${l.t}" d="${l.d}"/></svg></span>` }).join('');
+  // sand under the clients: the underwater-sand clip from the amigosd.com text texture, faint, plays only while on screen (no blend modes)
+  const cs = cl && cl.closest('section'); if (cs && !$('.sandv', cs)) { const sv = document.createElement('video'); sv.className = 'sandv'; sv.muted = true; sv.loop = true; sv.playsInline = true; sv.setAttribute('playsinline', ''); sv.setAttribute('aria-hidden', 'true'); sv.preload = 'metadata'; sv.poster = 'assets/clips/sand.jpg'; sv.src = 'assets/clips/sand.mp4'; cs.insertBefore(sv, cs.firstChild);
+    if (!RM && 'IntersectionObserver' in window) new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? sv.play().catch(() => { }) : sv.pause()), { rootMargin: '100px' }).observe(cs) }
   $$('[data-work]').forEach(w => w.innerHTML = w.dataset.work.split(',').map(s => { const [k, c] = s.split(':'); return piece(k, c) }).join(''));
   $$('[data-doors]').forEach(w => w.innerHTML = w.dataset.doors.split(',').map(k => door(k, 'specialty.html#' + k)).join(''));
   specialty();
