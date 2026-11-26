@@ -261,11 +261,11 @@ function horizon() {
   const W = sec.clientWidth, ph = phone(), gx = px('--gx'), hy = ph ? 120 : 170, r = ph ? 10 : 16, R = ph ? 34 : 50, sx = W * (ph ? .7 : .74), k = R / 50;
   svg.setAttribute('viewBox', `0 0 ${W} ${hy + 80}`); svg.style.height = hy + 80 + 'px';
   HZ = { hy, r }; sec.style.setProperty('--sr', R + 10 + 'px'); $('.inner', sec).style.paddingTop = hy + (ph ? 84 : 120) + 'px';
-  const bird = (x, y, s) => `<path class="s ln" pathLength="1" style="--d:1.9s;--t:.8s" d="M${x - 46 * s} ${y - 2 * s}Q${x - 23 * s} ${y - 20 * s} ${x} ${y}Q${x + 23 * s} ${y - 20 * s} ${x + 46 * s} ${y - 2 * s}"/>`;
+  const bird = (x, y, s) => `<g class="bird" style="--bd:${(x % 7 / 10).toFixed(1)}s"><path class="s ln" pathLength="1" style="--d:1.9s;--t:.8s" d="M${x - 46 * s} ${y - 2 * s}Q${x - 23 * s} ${y - 20 * s} ${x} ${y}Q${x + 23 * s} ${y - 20 * s} ${x + 46 * s} ${y - 2 * s}"/></g>`;
   svg.innerHTML = `<defs><clipPath id="hzc"><rect x="0" y="-200" width="${W}" height="${hy + 200}"/></clipPath></defs>
   <g clip-path="url(#hzc)"><circle class="sun" cx="${sx}" cy="${hy}" r="${R}"/></g>
   <path class="s ln" pathLength="1" style="--t:1.5s" d="M${gx} ${hy - r}A${r} ${r} 0 0 0 ${gx + r} ${hy}H${W + 6}"/>
-  ${[[16, 34, 1], [32, 20, .62], [48, 9, .36]].map(([dy, hw, o], i) => `<path class="s ln" pathLength="1" style="--d:${1.5 + i * .16}s;--t:.6s;opacity:${o}" d="M${sx - hw * k} ${hy + dy * k}H${sx + hw * k}"/>`).join('')}
+  ${[[16, 34, 1], [32, 20, .62], [48, 9, .36]].map(([dy, hw, o], i) => `<path class="s ln refl" pathLength="1" style="--d:${1.5 + i * .16}s;--t:.6s;--ro:${o};--rd:${i * .45}s" d="M${sx - hw * k} ${hy + dy * k}H${sx + hw * k}"/>`).join('')}
   ${bird(sx - 3.4 * R, hy - 1.35 * R, .62 * k)}${bird(sx - 5 * R, hy - 2.15 * R, .42 * k)}`;
   const halo = $('.halo', sec); halo.style.left = sx + 'px'; halo.style.top = hy + 'px';
 }
