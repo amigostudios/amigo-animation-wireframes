@@ -454,7 +454,7 @@ section[data-ground]{background-blend-mode:normal}
 .gmore{display:flex;flex-wrap:wrap;align-items:center;gap:14px 28px;margin-top:clamp(28px,3vw,44px)}
 .gmore .btn{margin-top:0}.gmore span{color:var(--soft);max-width:52ch}
 @media (hover:none){.gal .lab{opacity:1}}
-@media (max-width:700px){.gin{padding-top:92px}.gword{font-size:calc((100vw - 104px) / 5.5);white-space:nowrap}.clients.mini span:nth-child(n+6){display:none}.work.gal{grid-template-columns:minmax(0,1fr);gap:12px}.gal .g2{grid-column:auto;grid-row:auto}.gal .g2 .fr{aspect-ratio:16/9;height:auto}.gpitch span{font-size:15px}}
+@media (max-width:700px){.gin{padding-top:92px}.gword{font-size:calc((100vw - 104px) / 5.5);white-space:nowrap}.clients.mini span:nth-child(n+5){display:none}.work.gal{grid-template-columns:minmax(0,1fr);gap:12px}.gal .g2{grid-column:auto;grid-row:auto}.gal .g2 .fr{aspect-ratio:16/9;height:auto}.gpitch span{font-size:15px}}
 /* ---- v26 (11-26): section headers in Oaxaca (Austin); their small notes and links stay in DM Sans; the client label stays a quiet label ---- */
 .hd:not(.lbl),.close h2{font-family:"Oaxaca",var(--sans);font-weight:400;letter-spacing:.015em;text-transform:uppercase}
 .hd:not(.lbl){font-size:clamp(28px,3vw,44px);line-height:1.05}
