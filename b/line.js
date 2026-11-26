@@ -58,7 +58,7 @@ function sandIn(sec) {
 }
 // How it goes, illustrated with one real job (Hook to Wormhole): wireframe -> storyboard frame -> final render, 16:9 + 9:16
 function wireTunnel() {
-  const W = 320, H = 180, cx = 172, cy = 86; let s = '';
+  const W = 320, H = 180, cx = 160, cy = 90; let s = '';
   for (let i = 0; i < 7; i++) s += `<rect class="wr" style="--i:${i}" x="${cx - 150}" y="${cy - 84}" width="300" height="168" rx="26"/>`
   const rays = [[0, 0], [W, 0], [0, H], [W, H], [W / 2, 0], [0, H * .55]].map(([x, y]) => `<path class="wy" d="M${x} ${y}L${cx} ${cy}"/>`).join('');
   return `<svg class="wire" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${rays}${s}</svg>`;
@@ -130,10 +130,10 @@ function hero(play) {
   if (STACK) {
     // 11-25 reorder (Austin): MOTION up top, the reel under it, then the shelf line; the one-line copy sits under the line, so the fold lands on the pitch
     if (!ph) {
-      const h0 = clamp(W * .056, 46, 96); SF = scriptFit(6.26 * h0 * 1.12, 420); h = SF.cap; wy = 92 + h;
+      const h0 = clamp(W * .056, 46, 96); SF = scriptFit(6.26 * h0 * 1.12, 420); h = SF.cap; wy = 112 + h;
       ry = wy + 34; const aH = Math.max(innerHeight * .52, innerHeight - ry - 270); rw = Math.round(Math.max(360, Math.min(W - 2 * x0, aH * 16 / 9, 1180))); rx = (W - rw) / 2;
       // MOTION spans the reel's width minus room for the place line on the right, so the two never touch
-      const room = rw - (sub.offsetWidth || 260) - 48; if (SF.w > room) { SF = scriptFit(room, 420); h = SF.cap; wy = 92 + h; ry = wy + 34 }
+      const room = rw - (sub.offsetWidth || 260) - 48; if (SF.w > room) { SF = scriptFit(room, 420); h = SF.cap; wy = 112 + h; ry = wy + 34 }
       gy = ry + rw * 9 / 16 + 40; Hh = Math.round(gy + 48);
     } else {
       SF = scriptFit(W - x0 - 22, 150); h = SF.cap; wy = 84 + h; ry = wy + 58; rw = W - 32; rx = 16; gy = ry + rw * 9 / 16 + 34; Hh = Math.round(gy + 44);
@@ -386,11 +386,18 @@ function tick() {
   // at the very bottom the line always closes (the last stretch could stay dotted when the page ends before the board gets there)
   if (max > 0 && scrollY >= max - 4) tgt = w.len + 30;
   // phones: the board tracks the scroll directly (the eased glide read as lag on touch scrolling)
-  if (RM || COARSE) { cur = tgt; paint() } else if (!wraf) wraf = requestAnimationFrame(glide);
+  if (RM) { cur = tgt; paint() } else if (COARSE) follow(); else if (!wraf) wraf = requestAnimationFrame(glide);
 }
 let fraf = 0, fy = -1, fidle = 0;
-function follow() { fidle = 0; if (!fraf) fraf = requestAnimationFrame(fstep) }
-function fstep() { fraf = 0; if (scrollY !== fy) { fy = scrollY; fidle = 0; tick() } else fidle++; if (fidle < 30) fraf = requestAnimationFrame(fstep) }
+function follow() { fidle = 0; if (WAY && cur !== tgt) { ease(); paint() } if (!fraf) fraf = requestAnimationFrame(fstep) }
+// phones: ease toward the target (glides through the curves) but never more than 150 px of line behind, however slow the frames
+function ease() { let d = tgt - cur; if (Math.abs(d) > 150) { cur = tgt - Math.sign(d) * 150; d = tgt - cur } cur += d * .3; if (Math.abs(tgt - cur) < .5) cur = tgt }
+function fstep() {
+  fraf = 0; if (scrollY !== fy) { fy = scrollY; fidle = 0; tick(); return } fidle++;
+  // phones (11-26): ease toward the target with a speed cap, so the board glides through the curves instead of snapping
+  if (WAY && cur !== tgt) { ease(); paint(); fidle = 0 }
+  if (fidle < 30) fraf = requestAnimationFrame(fstep)
+}
 function glide() { wraf = 0; cur += (tgt - cur) * .13; if (Math.abs(tgt - cur) < .4) cur = tgt; paint(); if (cur !== tgt) wraf = requestAnimationFrame(glide) }
 function spray(now) {
   const dt = Math.min(.05, (now - sT) / 1000); sT = now;
@@ -416,14 +423,14 @@ function paint() {
   const fo = clamp((w.lenMain - 4 - L) / 90), bs = w.rider.firstChild.style; if (bs.opacity !== fo.toFixed(2)) bs.opacity = fo.toFixed(2);
   const drawn = Math.max(0, L - 30);
   const ink = () => w.sols.forEach(p => { if (drawn <= 0) { p.style.visibility = 'hidden' } else { p.style.visibility = ''; p.style.strokeDasharray = drawn + ' ' + (w.len + 60) } });
-  if (COARSE) { clearTimeout(w.inkT); w.inkT = setTimeout(ink, 140) } else ink();
+  if (COARSE) { const now = performance.now(); if (now - (w.inkAt || 0) > 50) { w.inkAt = now; ink() } clearTimeout(w.inkT); w.inkT = setTimeout(ink, 90) } else ink();
   w.rider.style.transform = `translate3d(${(pt.x + ox0).toFixed(1)}px,${(pt.y + oy0).toFixed(1)}px,0) rotate(${(Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI).toFixed(1)}deg)`;
   let g = 'black'; w.secs.forEach((s, i) => { if (pt.y >= w.tops[i]) g = s.dataset.ground }); w.rider.dataset.ground = g; w.spray.dataset.ground = g;
   // spray: when the board turns hard, dots fly off the tail on the outside of the turn
   const hd = Math.atan2(b.y - a.y, b.x - a.x), dL = L - pL; let dA = pAng == null ? 0 : hd - pAng; dA = Math.atan2(Math.sin(dA), Math.cos(dA)); pAng = hd; pL = L;
-  if (!RM && Math.abs(dA) > .028 && Math.abs(dL) > 2.5 && L < w.lenMain - 4) {
-    const dir = Math.sign(dL), fx = Math.cos(hd) * dir, fy = Math.sin(hd) * dir, sd = -Math.sign(dA) * dir, ox = -fy * sd, oy = fx * sd, n = Math.min(4, Math.ceil(Math.abs(dA) * 22)), sp = Math.min(190, 50 + Math.abs(dL) * 7);
-    for (let i = 0; i < n && PARTS.length < 70; i++) { const q = Math.random(), r = Math.random(), c = COARSE ? null : el('circle', { r: (.9 + r * 1.5).toFixed(2) }, w.spray); PARTS.push({ c, r: .9 + r * 1.5, x: pt.x - fx * (14 + q * 10) + ox * 3, y: pt.y - fy * (14 + q * 10) + oy * 3, vx: ox * sp * (.45 + r * .8) - fx * sp * (.1 + q * .35), vy: oy * sp * (.45 + r * .8) - fy * sp * (.1 + q * .35), t: 0, life: .45 + q * .55 }) }
+  if (!RM && Math.abs(dA) > (COARSE ? .05 : .028) && Math.abs(dL) > (COARSE ? 1.5 : 2.5) && L < w.lenMain - 4 && L > 0) {
+    const dir = Math.sign(dL), fx = Math.cos(hd) * dir, fy = Math.sin(hd) * dir, sd = -Math.sign(dA) * dir, ox = -fy * sd, oy = fx * sd, n = COARSE ? Math.min(2, Math.ceil(Math.abs(dA) * 14)) : Math.min(4, Math.ceil(Math.abs(dA) * 22)), sp = COARSE ? 85 : Math.min(190, 50 + Math.abs(dL) * 7);
+    for (let i = 0; i < n && PARTS.length < (COARSE ? 18 : 70); i++) { const q = Math.random(), r = Math.random(), c = COARSE ? null : el('circle', { r: (.9 + r * 1.5).toFixed(2) }, w.spray); PARTS.push({ c, r: .9 + r * 1.5, x: pt.x - fx * (14 + q * 10) + ox * 3, y: pt.y - fy * (14 + q * 10) + oy * 3, vx: ox * sp * (.45 + r * .8) - fx * sp * (.1 + q * .35), vy: oy * sp * (.45 + r * .8) - fy * sp * (.1 + q * .35), t: 0, life: .45 + q * .55 }) }
     if (!sraf) { sT = performance.now(); sraf = requestAnimationFrame(spray) }
   }
   const hz = $('#start'); if (hz && L >= w.lenMain - 2) hz.classList.add('risen');
@@ -440,7 +447,7 @@ function specialty() {
     <div class="inner"><div class="col shero in"><div><h1>${d[0]}</h1><p>[One line]</p></div><div class="big">${icon(key, Math.round(Math.min(260, innerWidth * .52)))}</div></div></div></header>
   <section data-g="black" data-g2="terra" class="getsec"><div class="inner sec"><div class="col"><h2 class="hd">What you get</h2><div class="c3">${[0, 1, 2].map(() => '<div>[Deliverable]<p>[One line]</p></div>').join('')}</div></div></div></section>
   <section data-g="night" data-side="r" id="work"><div class="inner sec"><div class="col"><h2 class="hd">Work<small>Placeholders until the pieces are picked</small></h2><div class="work">${SPEC_WORK[key].map((k, i) => piece(k, i < 2 ? 'w6' : 'w4')).join('')}</div></div></div></section>
-  <section data-g="terra" data-g2="sea" data-side="r" class="howsec"><div class="inner sec"><div class="col"><h2 class="hd">How it goes</h2><div class="steps" data-in><svg class="art tl" aria-hidden="true"></svg>${['Concept', 'Storyboard and style frames', 'Animation and delivery'].map((s, i) => `<div><figure class="pv pv${i}">${[wireTunnel(), '<img src="assets/process/board.jpg" alt="Storyboard frame: the wormhole" loading="lazy">', '<video src="assets/process/final.mp4" poster="assets/process/final.jpg" muted loop playsinline autoplay preload="metadata" aria-label="Final render: the wormhole"></video>'][i]}</figure>${s}<p>[One line]</p></div>`).join('')}</div><p class="pvnote">Shown with one real job, Hook to Wormhole for Jiffy Learning</p></div></div></section>
+  <section data-g="terra" data-g2="sea" data-side="r" class="howsec"><div class="inner sec"><div class="col"><h2 class="hd">How it goes</h2><div class="steps" data-in><svg class="art tl" aria-hidden="true"></svg>${['Concept', 'Storyboard and style frames', 'Animation and delivery'].map((s, i) => `<div data-in><figure class="pv pv${i}">${[wireTunnel(), '<img src="assets/process/board.jpg" alt="Storyboard frame: the wormhole" loading="lazy">', '<video src="assets/process/final.mp4" poster="assets/process/final.jpg" muted loop playsinline autoplay preload="metadata" aria-label="Final render: the wormhole"></video>'][i]}</figure>${s}<p>[One line]</p></div>`).join('')}</div><p class="pvnote">Shown with one real job, Hook to Wormhole for Jiffy Learning</p></div></div></section>
   <section data-g="tan" data-g2="black"><div class="inner sec"><div class="col"><h2 class="hd">Other specialties</h2><div class="doors">${Object.keys(DOORS).filter(k => k !== key).map(k => door(k, 'specialty.html#' + k)).join('')}</div></div></div></section>
   <section data-g="paper" data-g2="black" class="endcap"><div class="inner sec"><div class="col cta"><h2 class="hd">Have one of these in mind?</h2><a class="btn" href="index.html#start">Start a project ${ARROW}</a><footer style="align-self:stretch"><span>Amigo Productions, Oceanside CA</span><span>[Links and social]</span></footer></div></div></section>`;
   $('header', root).style.setProperty('--tt', '92px');
@@ -487,7 +494,37 @@ function viewer(i) {
   $('.vlab b', V).textContent = w ? w[0] : ''; $('.vlab span', V).textContent = w ? w[1] : ''; $('.vlab small', V).textContent = `${i + 1} / ${n}`;
   V.classList.add('on'); document.documentElement.classList.add('vlock'); $('.vx', V).focus({ preventScroll: true });
 }
+// site header, matched to the amigosd.com rebuild (Header.tsx): cactus logo top left, Work Sans links with a clay
+// brush underline and a clay "Start a project" pill; dark bar fades in once scrolled; tucks away scrolling down, back on
+// the first scroll up. Phones: burger -> full-screen clay menu with the four specialties as pictures. (11-26)
+function siteHeader() {
+  if ($('.sh')) return;
+  const spec = !!$('#spec'); let home = 'index.html';
+  if (spec) { try { home = sessionStorage.getItem('amigo-home') || home } catch (e) { } } else { home = $('.gal') ? 'gallery.html' : 'index.html'; try { sessionStorage.setItem('amigo-home', home) } catch (e) { } }
+  const h = k => (spec ? home : '') + '#' + k, TH = { commercials: 'airport', ui: 'zebra_scheduling', '3d': 'jiffy_hook', packages: 'zebra_inventory' };
+  const links = [['Work', h('work')], ['What we make', h('doors')], ['Team', h('about')]];
+  const hd = document.createElement('header'); hd.className = 'sh';
+  hd.innerHTML = `<a class="sh-logo" href="${home}" aria-label="Amigo Animation, home"><img src="assets/amigo-logo.png" alt="" width="89" height="86"></a>
+    <nav aria-label="Main"><ul class="sh-nav">${links.map(([t, u]) => `<li><a class="top" href="${u}">${t}</a></li>`).join('')}<li><a class="sh-cta" href="${h('start')}">Start a project</a></li></ul></nav>
+    <button class="sh-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="sh-menu"><span></span></button>`;
+  const mm = document.createElement('div'); mm.className = 'sh-menu'; mm.id = 'sh-menu'; mm.setAttribute('role', 'dialog'); mm.setAttribute('aria-modal', 'true'); mm.setAttribute('aria-label', 'Menu'); mm.setAttribute('aria-hidden', 'true');
+  mm.innerHTML = `<button class="sh-x" type="button" aria-label="Close menu"><span></span></button><nav aria-label="Menu">
+    <a class="m-link" style="--i:0" href="${h('work')}">Work</a><a class="m-link" style="--i:1" href="${h('doors')}">What we make</a>
+    <ul class="m-work">${Object.keys(DOORS).map((k, n) => `<li style="--i:${2 + n * .5}"><a href="specialty.html#${k}"><img src="assets/clips/${TH[k]}.jpg" alt="" width="440" height="248" loading="lazy"><span>${DOORS[k][0]}</span></a></li>`).join('')}</ul>
+    <a class="m-link" style="--i:4.5" href="${h('about')}">Team</a></nav>
+    <div class="m-foot" style="--i:5.5"><a class="m-cta" href="${h('start')}">Start a project</a><p><span>[Phone]</span><span>[Email]</span></p></div>`;
+  document.body.prepend(mm); document.body.prepend(hd); document.documentElement.classList.add('has-sh');
+  const burger = $('.sh-burger', hd), x = $('.sh-x', mm);
+  const set = (on, kb) => { mm.classList.toggle('open', on); mm.setAttribute('aria-hidden', !on); burger.setAttribute('aria-expanded', on); document.documentElement.classList.toggle('vlock', on); if (kb) (on ? x : burger).focus({ preventScroll: true }) };
+  burger.addEventListener('click', e => set(true, e.detail === 0)); x.addEventListener('click', e => set(false, e.detail === 0));
+  $$('a', mm).forEach(a => a.addEventListener('click', () => set(false)));
+  addEventListener('keydown', e => { if (e.key === 'Escape' && mm.classList.contains('open')) set(false, true) });
+  let last = scrollY, raf = 0;
+  const read = () => { raf = 0; const y = scrollY; hd.classList.toggle('scrolled', y > 24); if (y < 160) hd.classList.remove('away'); else if (y > last + 6) hd.classList.add('away'); else if (y < last - 6) hd.classList.remove('away'); last = y };
+  read(); addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(read) }, { passive: true });
+}
 function swipes() {
+  return; // 11-26: Austin found the sideways work rows bad UI on phones; work is a vertical 2-up grid instead
   if (!phone()) return; $$('.work:not(.gal)').forEach(w => { if (w._sw) return; w._sw = 1; const n = w.children.length, c = document.createElement('p'); c.className = 'swipe'; c.innerHTML = `<span>1 / ${n}</span> Swipe for more ${ARROW}`; w.after(c);
     let r = 0; w.addEventListener('scroll', () => { if (r) return; r = requestAnimationFrame(() => { r = 0; const k = Math.round(w.scrollLeft / (w.children[0].offsetWidth + 12)); c.firstChild.textContent = `${Math.min(n, k + 1)} / ${n}` }) }, { passive: true }) });
 }
@@ -522,7 +559,13 @@ function init() {
   // footer: [Links and social] removed, and the badge taken out again (Austin 11-26); the footer is just the place line
   $$('footer span').forEach(s => { if (s.textContent.trim() === '[Links and social]') s.remove() });
   // phones: work rows become a sideways swipe with a counter, so the page is not one long scroll of past work (11-26)
-  swipes();
+  swipes(); siteHeader();
+  // phones: client logos drift by in a slow marquee (two rows in opposite directions on the full wall, one row in the gallery intro) instead of a ragged wrap (11-26)
+  if (phone() && !RM && cl && cl.children.length) { const items = $$('span', cl).map(s => s.outerHTML), mini2 = cl.classList.contains('mini'), rows = mini2 ? [items] : [items.slice(0, Math.ceil(items.length / 2)), items.slice(Math.ceil(items.length / 2))];
+    cl.classList.add('mq'); cl.innerHTML = rows.map((r, i) => `<div class="mq-row${i % 2 ? ' rev' : ''}" style="--n:${r.length}"><div class="mq-track">${r.join('')}${r.join('')}</div></div>`).join('') }
+  // Start a project rises in as it comes on screen; the sun + birds come up when the close is well in view, not only when the board arrives (11-26)
+  $$('#start .col').forEach(c => c.setAttribute('data-in', ''));
+  const st0 = $('#start'); if (st0 && 'IntersectionObserver' in window) { const o = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { st0.classList.add('risen'); o.disconnect() } }), { threshold: .35 }); o.observe(st0) }
   $$('.bar .name').forEach(a => { a.innerHTML = logoSvg(phone() ? 40 : 46) + '<span class="sr">Amigo Animation, home</span>'; a.setAttribute('aria-label', 'Amigo Animation, home') });
   let m = 'dusk'; try { m = localStorage.getItem('amigo-b-ground2') || m } catch (e) { }
   $$('.grounds button[data-m]').forEach(b => b.addEventListener('click', () => ground(b.dataset.m)));
