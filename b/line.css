@@ -401,4 +401,8 @@ section[data-ground]{background-blend-mode:normal}
 /* ---- v19: header: underwater sand clip in place of the studio photo (amigosd.com text texture; Wix stock, rights to check). Plain opacity, no blend modes ---- */
 .wallv{position:absolute;left:0;top:0;width:100%;height:var(--tt,70%);object-fit:cover;opacity:.3;pointer-events:none;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.6),#000 45%);mask-image:linear-gradient(to bottom,rgba(0,0,0,.6),#000 45%)}
 .wallv[hidden]{display:none}
+/* ---- v20: MOTION in Oaxaca (Amigo's brand face); letters rise out of the line, clipped at the baseline (no rounded clip, no blend) ---- */
+@font-face{font-family:"Oaxaca";src:url(assets/fonts/Oaxaca.woff) format("woff");font-display:swap}
+.script.ox{color:var(--ln);letter-spacing:.01em;-webkit-clip-path:inset(-60% -12% var(--cb,0px) -12%);clip-path:inset(-60% -12% var(--cb,0px) -12%)}
+.script.ox i{display:inline-block;font-style:normal;will-change:transform}
 [data-ground="paper"] .wallv,[data-ground="tan"] .wallv{opacity:.22}

@@ -81,10 +81,11 @@ function farPalm(bx, gy, PH) {
   return out;
 }
 let TOP = 'curve', WORD = 'line';
-const FONTS = { script: 'Sacramento', brush: 'Yellowtail' };
+const FONTS = { script: 'Sacramento', brush: 'Yellowtail', oaxaca: 'Oaxaca' };
+const WTXT = () => WORD === 'oaxaca' ? 'MOTION' : 'Motion';
 // fits the script word to the room it has: returns font size, the height of its tall letters and where its baseline sits in the line box
 function scriptFit(avail, maxFs) {
-  const c = document.createElement('canvas').getContext('2d'); c.font = `100px "${FONTS[WORD]}", cursive`; const m = c.measureText('Motion');
+  const c = document.createElement('canvas').getContext('2d'); c.font = `100px "${FONTS[WORD]}", cursive`; const m = c.measureText(WTXT());
   const fs = Math.min(avail / (m.width + 6) * 100, maxFs), A = (m.fontBoundingBoxAscent || 90) * fs / 100, Dn = (m.fontBoundingBoxDescent || 35) * fs / 100;
   return { fs, cap: (m.actualBoundingBoxAscent || 70) * fs / 100, base: (fs - (A + Dn)) / 2 + A, w: m.width * fs / 100 };
 }
@@ -102,7 +103,8 @@ function hero(play) {
     else if (V === 'wave') { k = Math.min((gy - yTop - 10) / 605, W * .4 / 1046); xs = W - 70 - 1046 * k; wAv = xs - 50 - x0 }
     else if (V === 'sun') { R = Math.min(132, (gy - yTop) * .27); xs = W * .8; wAv = xs - R - 90 - x0 } else { xs = W * .64; wAv = xs - 56 - x0 }
     h = clamp(wAv / 6.26, 34, 128); wy = gy; if (SC) { SF = scriptFit(wAv, 300); h = SF.cap }
-    const BIG = V !== 'wave' && !SC; if (BIG) h = clamp(W * .05, 40, 76);
+    const OX = WORD === 'oaxaca', BIG = V !== 'wave' && (!SC || OX); if (BIG) h = clamp(W * .05, 40, 76);
+    if (OX) { SF = scriptFit(6.26 * h * 1.12, 400); h = SF.cap }
     const hAv = gy - h - 40 - 104; rw = Math.max(260, Math.min(wAv, hAv * 16 / 9)); ry = gy - h - 40 - rw * 9 / 16;
     if (BIG) { const top = 92, hA = gy - h - 34 - top; rw = Math.max(260, Math.min(W - 2 * x0 - 200, hA * 16 / 9)); rx = (W - rw) / 2; ry = top + (hA - rw * 9 / 16) / 2; const mg = W - rx - rw; if (V === 'sun') { R = Math.min(84, mg * .36); xs = rx + rw + mg / 2 } else xs = rx + rw + Math.min(40, mg * .2) }
   } else {
@@ -165,7 +167,9 @@ function hero(play) {
   const S = { W, ph, gx, gy, light, guide, reel, xtra: $('.xtra', svg), stem: mk(stem), fr: fr.map(mk), tips: tips ? fr.map(f => el('circle', { class: 'f', cx: f[72][0], cy: f[72][1], r: 0 }, svg)) : [], ride: tips, node: el('circle', { class: 'f', cx: gx, cy: gy, r: 0 }, svg) };
   S.sun = $('.sunf', svg); S.sunR = R;
   S.let = SC ? [] : letters(ph ? x0 : rx, wy, h).map(l => ({ cx: l.cx, t0: null, p: l.strokes.map(mk) }));
-  if (sc) { sc.hidden = !SC; if (SC) { sc.style.fontFamily = `"${FONTS[WORD]}", cursive`; sc.style.fontSize = SF.fs + 'px'; sc.style.left = x0 + 'px'; sc.style.top = (wy - SF.base + (WORD === 'brush' ? SF.fs * .02 : SF.fs * .035)) + 'px'; S.sc = sc; S.scX = x0; S.scW = SF.w } } S.fan = fan; S.tilt = tilt; S.box = [wy - h, wy, h]; S.st = st;
+  if (sc) { sc.hidden = !SC; sc.classList.toggle('ox', WORD === 'oaxaca'); if (SC) { sc.style.fontFamily = `"${FONTS[WORD]}", cursive`; sc.style.fontSize = SF.fs + 'px'; sc.style.left = (WORD === 'oaxaca' && !ph ? rx : x0) + 'px';
+      // Oaxaca: each letter rises up out of the line it stands on (clipped at the baseline), one after another, and settles with a little overshoot
+      if (WORD === 'oaxaca') { sc.innerHTML = [...'MOTION'].map(ch => `<i>${ch}</i>`).join(''); sc.style.setProperty('--cb', (SF.fs - SF.base - SF.fs * .035).toFixed(1) + 'px'); S.ox = [...sc.children]; S.oxT = ph ? null : .55 } else sc.textContent = 'Motion'; sc.style.top = (wy - SF.base + (WORD === 'brush' ? SF.fs * .02 : SF.fs * .035)) + 'px'; S.sc = sc; S.scX = x0; S.scW = SF.w } } S.fan = fan; S.tilt = tilt; S.box = [wy - h, wy, h]; S.st = st;
   S.Ts = ph ? 1.8 : 2.5; S.tF = .3 + S.Ts - .14; S.tL = S.tF + .7; S.end = (ph ? S.tL + 5 * .08 + .9 : S.tF + 2.1);
   if (H && H.raf) cancelAnimationFrame(H.raf);
   H = S;
@@ -190,7 +194,8 @@ function frame(S, t) {
   S.light.style.transform = `translate(${pos.x.toFixed(1)}px,${pos.y.toFixed(1)}px) scale(${pulse.toFixed(3)})`;
   S.light.style.opacity = t < .3 || TOP === 'none' ? 0 : 1;
   S.guide.style.opacity = all ? 0 : 1 - clamp((t - S.tF - .5) / .6);
-  if (S.sc) S.sc.style.setProperty('--wv', all ? 1 : S.ph ? easeIO(clamp((t - S.tL) / 1.3)).toFixed(3) : clamp((d - S.scX - 20) / S.scW).toFixed(3));
+  if (S.ox) { const t0 = S.oxT ?? S.tL - .4; S.ox.forEach((e, i) => { const u = all ? 1 : clamp((t - t0 - i * .085) / .75), y = u >= 1 ? 0 : (1 - back(u)) * 112; e.style.transform = y ? `translateY(${y.toFixed(1)}%)` : '' }) }
+  else if (S.sc) S.sc.style.setProperty('--wv', all ? 1 : S.ph ? easeIO(clamp((t - S.tL) / 1.3)).toFixed(3) : clamp((d - S.scX - 20) / S.scW).toFixed(3));
   if (S.reel) S.reel.style.setProperty('--rv', all ? 1 : easeIO(clamp((t - .55) / 1.5)).toFixed(3));
 }
 
@@ -351,7 +356,9 @@ function spray(now) {
 function at(L) { const w = WAY, u = clamp(L, 0, w.len) / w.step, i = Math.min(w.n - 2, Math.floor(u)), r = u - i, T = w.T; return { x: T[i * 2] + (T[i * 2 + 2] - T[i * 2]) * r, y: T[i * 2 + 1] + (T[i * 2 + 3] - T[i * 2 + 1]) * r } }
 function off() { const w = WAY; return COARSE ? [w.pl - scrollX, w.pt - scrollY] : [0, 0] }
 function paint() {
-  const w = WAY, L = clamp(cur, 0, w.len), a = at(Math.max(0, L - 3)), b = at(Math.min(w.len, L + 3)), pt = at(L), [ox0, oy0] = off();
+  // Austin 11-25: the board doesn't take the hard turn into the horizon; it fades out at the bottom of the last vertical (the line still inks on)
+  const w = WAY, L = clamp(cur, 0, w.len), Lb = Math.min(L, w.lenMain - 4), a = at(Math.max(0, Lb - 3)), b = at(Math.min(w.len, Lb + 3)), pt = at(Lb), [ox0, oy0] = off();
+  const fo = clamp((w.lenMain - 4 - L) / 90), bs = w.rider.firstChild.style; if (bs.opacity !== fo.toFixed(2)) bs.opacity = fo.toFixed(2);
   const drawn = Math.max(0, L - 30);
   const ink = () => w.sols.forEach(p => { if (drawn <= 0) { p.style.visibility = 'hidden' } else { p.style.visibility = ''; p.style.strokeDasharray = drawn + ' ' + (w.len + 60) } });
   if (COARSE) { clearTimeout(w.inkT); w.inkT = setTimeout(ink, 140) } else ink();
@@ -424,7 +431,7 @@ function init() {
   try { TOP = localStorage.getItem('amigo-b-top') || TOP } catch (e) { } if (!['curve', 'wave', 'sun'].includes(TOP)) TOP = 'curve'; TOP = 'none'; // Austin 11-25: no drawing on top (Curve/Wave/Sun read as distracting); the line just runs along the shelf. Drawing code kept for reference
   const setTop = (v, go) => { TOP = v; $$('.grounds button[data-v]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); try { localStorage.setItem('amigo-b-top', v) } catch (e) { } if (go) { scrollTo(0, 0); hero(true); way(); tick() } };
   $$('.grounds button[data-v]').forEach(b => b.addEventListener('click', () => setTop(b.dataset.v, true))); setTop(TOP, false);
-  try { WORD = localStorage.getItem('amigo-b-word') || WORD } catch (e) { } WORD = 'line'; // Austin picked Line 11-25; script code kept for reference
+  try { WORD = localStorage.getItem('amigo-b-word') || WORD } catch (e) { } WORD = 'oaxaca'; // 11-25: Austin moved MOTION from the line-drawn word to Oaxaca (brand face) with a rise-up reveal; line/script code kept for reference
   const setWord = (v, go) => { WORD = v; $$('.grounds button[data-w]').forEach(b => b.setAttribute('aria-pressed', b.dataset.w === v)); try { localStorage.setItem('amigo-b-word', v) } catch (e) { } if (go) { const run = () => { scrollTo(0, 0); hero(true); way(); tick() }; v !== 'line' && document.fonts && document.fonts.load ? document.fonts.load(`100px "${FONTS[v]}"`, 'Motion').then(run, run) : run() } };
   $$('.grounds button[data-w]').forEach(b => b.addEventListener('click', () => setWord(b.dataset.w, true))); setWord(WORD, false);
   const ob = $('.optbtn'); if (ob) ob.addEventListener('click', () => { const on = document.body.classList.toggle('opts'); ob.setAttribute('aria-expanded', on); ob.textContent = on ? 'Close' : 'Options' });
