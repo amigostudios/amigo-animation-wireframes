@@ -345,7 +345,7 @@ function way() {
   let x = X(secs[0]), d = `M${x} ${secs[0].offsetTop + (parseFloat(secs[0].style.getPropertyValue('--tt')) || 0)}`; const hs = [];
   for (let i = 1; i < secs.length; i++) {
     const a = secs[i - 1], b = secs[i], nx = X(b); if (nx === x) continue;
-    const sa = $('.sec', a) || a; sa.style.paddingBottom = (phone() ? 150 : 270) + 'px'; b.classList.add('xin');
+    const sa = $('.sec', a) || a; sa.style.paddingBottom = (phone() ? 104 : 270) + 'px'; b.classList.add('xin');
     const pb = parseFloat(getComputedStyle(sa).paddingBottom) || 0, pt = parseFloat(getComputedStyle($('.sec', b) || b).paddingTop) || 0;
     let y1 = b.offsetTop + (b.id === 'start' || b.classList.contains('endcap') ? 30 : Math.min(Math.max(pt - 26, 14), 60)), y0 = a.offsetTop + a.offsetHeight - pb + 34;
     const k = (y1 - y0) * .9; d += `L${x} ${y0}C${x} ${y0 + k} ${nx} ${y1 - k} ${nx} ${y1}`; hs.push([x, y0, x, y0 + k], [nx, y1, nx, y1 - k]); x = nx;
