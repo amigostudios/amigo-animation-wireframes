@@ -395,3 +395,6 @@ section[data-ground]{background-blend-mode:normal}
 
 /* ---- v16: phones: board + spray in a screen-fixed layer (late iOS scroll updates can't carry it off screen) ---- */
 #rider.fx,#spray.fx{position:fixed;left:0;top:0;z-index:3}
+/* ---- v17: water photo under the horizon in the close (texture; placeholder photo) ---- */
+.close .sea{position:absolute;left:0;right:0;height:min(820px,78%);background:url(assets/water.jpg) center top/cover no-repeat;opacity:.2;pointer-events:none;-webkit-mask-image:linear-gradient(#000 0,rgba(0,0,0,.55) 35%,transparent 100%);mask-image:linear-gradient(#000 0,rgba(0,0,0,.55) 35%,transparent 100%)}
+.close .inner{position:relative}
