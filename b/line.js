@@ -384,7 +384,7 @@ function init() {
   }
   const rp = $('.replay'); if (rp) rp.addEventListener('click', () => hero(true));
   const fm = $('#fm'); if (fm) fm.addEventListener('submit', e => { e.preventDefault(); fm.hidden = true; $('#thanks').hidden = false });
-  let rt, lw = innerWidth; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (innerWidth !== lw) { lw = innerWidth; layout(false) } else { way(); tick() } }, 160) });
+  let rt, lw = innerWidth, lh = innerHeight; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (innerWidth !== lw || (innerWidth >= 700 && Math.abs(innerHeight - lh) > 60)) { lw = innerWidth; lh = innerHeight; layout(false) } else { way(); tick() } }, 160) });
   let q = false; addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(() => { q = false; tick() }) } }, { passive: true });
   addEventListener('load', () => { fit(); way(); tick() });
   addEventListener('hashchange', () => { if ($('#spec')) { specialty(); ground(document.querySelector('.grounds button[data-m][aria-pressed="true"]').dataset.m); layout(false); wire() } });
