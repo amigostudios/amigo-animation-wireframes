@@ -399,8 +399,14 @@ section[data-ground]{background-blend-mode:normal}
 .close .sea{position:absolute;left:0;right:0;height:min(820px,78%);background:url(assets/water.jpg) center top/cover no-repeat;opacity:.2;pointer-events:none;-webkit-mask-image:linear-gradient(#000 0,rgba(0,0,0,.55) 35%,transparent 100%);mask-image:linear-gradient(#000 0,rgba(0,0,0,.55) 35%,transparent 100%)}
 .close .inner{position:relative}
 /* v21: the water photo now lives behind the wave pool section instead */
-#say .sea{position:absolute;inset:0;background:url(assets/water.jpg) center/cover no-repeat;opacity:.3;pointer-events:none;-webkit-mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent);mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent)}
-#say .inner{position:relative}
+/* v23 (11-25 reorder): wave pool removed; the one-line pitch sits in the header under the shelf line; sand clip behind the logos again */
+.hsay{position:relative;z-index:1;padding-top:clamp(26px,3vw,44px);padding-bottom:clamp(64px,8vw,120px)}
+.hsay .say{padding-block:0;max-width:min(62%,820px)}
+.sandv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.2;pointer-events:none;-webkit-mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent);mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent)}
+.sandv + .inner{position:relative}
+@media (max-width:700px){.hsay .say{max-width:none}}
+#stage[data-top="none"]::before{display:none}
+#stage[data-top="none"] .replay{bottom:auto;top:calc(var(--gyy,0px) + 14px)}
 /* ---- v19: header: underwater sand clip in place of the studio photo (amigosd.com text texture; Wix stock, rights to check). Plain opacity, no blend modes ---- */
 .wallv{position:absolute;left:0;top:0;width:100%;height:var(--tt,70%);object-fit:cover;opacity:.3;pointer-events:none;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.6),#000 45%);mask-image:linear-gradient(to bottom,rgba(0,0,0,.6),#000 45%)}
 .wallv[hidden]{display:none}

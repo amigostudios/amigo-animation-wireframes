@@ -82,7 +82,7 @@ function farPalm(bx, gy, PH) {
 }
 let TOP = 'curve', WORD = 'line';
 const FONTS = { script: 'Sacramento', brush: 'Yellowtail', oaxaca: 'Oaxaca' };
-const WTXT = () => WORD === 'oaxaca' ? 'MOTION' : 'Motion';
+const WTXT = () => WORD === 'oaxaca' ? 'ANIMATION' : 'Motion'; // 11-25: Austin: "animation vs motion"
 // fits the script word to the room it has: returns font size, the height of its tall letters and where its baseline sits in the line box
 function scriptFit(avail, maxFs) {
   const c = document.createElement('canvas').getContext('2d'); c.font = `100px "${FONTS[WORD]}", cursive`; const m = c.measureText(WTXT());
@@ -97,7 +97,20 @@ function hero(play) {
   // zone = the box the drawing gets: from xs (where it leaves the ground) to the right edge, from yTop down to the ground gy
   let Hh, gy, h, wy, rw, ry, rx = x0, xs, yTop, wAv, PH, R, fil, lean, bx, k, SF = null; const SC = WORD !== 'line', sc = $('.script', st);
   const palmDims = hgt => { PH = hgt; R = PH * .207; fil = PH * .104; lean = PH * .063 };
-  if (!ph) {
+  const STACK = V === 'none' && WORD === 'oaxaca';
+  if (STACK) {
+    // 11-25 reorder (Austin): MOTION up top, the reel under it, then the shelf line; the one-line copy sits under the line, so the fold lands on the pitch
+    if (!ph) {
+      const h0 = clamp(W * .056, 46, 96); SF = scriptFit(6.26 * h0 * 1.12, 420); h = SF.cap; wy = 92 + h;
+      ry = wy + 34; const aH = Math.max(innerHeight * .52, innerHeight - ry - 270); rw = Math.round(Math.max(360, Math.min(W - 2 * x0, aH * 16 / 9, 1180))); rx = (W - rw) / 2;
+      // MOTION spans the reel's width minus room for the place line on the right, so the two never touch
+      const room = rw - (sub.offsetWidth || 260) - 48; if (SF.w > room) { SF = scriptFit(room, 420); h = SF.cap; wy = 92 + h; ry = wy + 34 }
+      gy = ry + rw * 9 / 16 + 40; Hh = Math.round(gy + 48);
+    } else {
+      SF = scriptFit(W - x0 - 22, 150); h = SF.cap; wy = 84 + h; ry = wy + 58; rw = W - 32; rx = 16; gy = ry + rw * 9 / 16 + 34; Hh = Math.round(gy + 44);
+    }
+    yTop = ry; xs = W; st.style.setProperty('--gyy', gy + 'px');
+  } else if (!ph) {
     Hh = Math.round(clamp(innerHeight, 600, 960)); gy = Hh - 132; yTop = 100;
     if (V === 'palm') { palmDims(Math.min(640, (gy - 96) / 1.16)); bx = Math.min(W * .875, W - 1.8 * R - 8); wAv = bx - lean - 1.75 * R - 70 - x0 }
     else if (V === 'wave') { k = Math.min((gy - yTop - 10) / 605, W * .4 / 1046); xs = W - 70 - 1046 * k; wAv = xs - 50 - x0 }
@@ -118,6 +131,7 @@ function hero(play) {
   st.style.height = Hh + 'px'; svg.setAttribute('viewBox', `0 0 ${W} ${Hh}`); st.style.setProperty('--hw', (ph ? 2 : clamp(W / 560, 2.2, 2.8)) + 'px');
   st.closest('[data-g]').style.setProperty('--tt', gy + 'px');
   sub.style.left = (ph ? x0 : rx) + 'px'; sub.style.top = (ph ? wy + 20 : gy + 26) + (SC ? SF.fs * (WORD === 'brush' ? .13 : .05) : 0) + 'px';
+  if (STACK) { if (ph) { sub.style.left = x0 + 'px'; sub.style.top = (wy + 12) + 'px' } else { sub.style.left = (rx + rw - sub.offsetWidth) + 'px'; sub.style.top = (wy - sub.offsetHeight + 2) + 'px' } }
   const wEnd = x0 + 6.26 * h;
   let stem, fr = [], fan = null, tilt = 0, far = '', extra = '', sunMk = '', guides = [], end, tips = false;
   st.dataset.top = V;
@@ -169,7 +183,7 @@ function hero(play) {
   S.let = SC ? [] : letters(ph ? x0 : rx, wy, h).map(l => ({ cx: l.cx, t0: null, p: l.strokes.map(mk) }));
   if (sc) { sc.hidden = !SC; sc.classList.toggle('ox', WORD === 'oaxaca'); if (SC) { sc.style.fontFamily = `"${FONTS[WORD]}", cursive`; sc.style.fontSize = SF.fs + 'px'; sc.style.left = (WORD === 'oaxaca' && !ph ? rx : x0) + 'px';
       // Oaxaca: each letter rises up out of the line it stands on (clipped at the baseline), one after another, and settles with a little overshoot
-      if (WORD === 'oaxaca') { sc.innerHTML = [...'MOTION'].map(ch => `<i>${ch}</i>`).join(''); sc.style.setProperty('--cb', (SF.fs - SF.base - SF.fs * .035).toFixed(1) + 'px'); S.ox = [...sc.children]; S.oxT = ph ? null : .55 } else sc.textContent = 'Motion'; sc.style.top = (wy - SF.base + (WORD === 'brush' ? SF.fs * .02 : SF.fs * .035)) + 'px'; S.sc = sc; S.scX = x0; S.scW = SF.w } } S.fan = fan; S.tilt = tilt; S.box = [wy - h, wy, h]; S.st = st;
+      if (WORD === 'oaxaca') { sc.innerHTML = [...WTXT()].map(ch => `<i>${ch}</i>`).join(''); sc.style.setProperty('--cb', (SF.fs - SF.base - SF.fs * .035).toFixed(1) + 'px'); S.ox = [...sc.children]; S.oxT = ph ? null : .55 } else sc.textContent = 'Motion'; sc.style.top = (wy - SF.base + (WORD === 'brush' ? SF.fs * .02 : SF.fs * .035)) + 'px'; S.sc = sc; S.scX = x0; S.scW = SF.w } } S.fan = fan; S.tilt = tilt; S.box = [wy - h, wy, h]; S.st = st;
   S.Ts = ph ? 1.8 : 2.5; S.tF = .3 + S.Ts - .14; S.tL = S.tF + .7; S.end = (ph ? S.tL + 5 * .08 + .9 : S.tF + 2.1);
   if (H && H.raf) cancelAnimationFrame(H.raf);
   H = S;
@@ -288,8 +302,8 @@ function horizon() {
   ${[[16, 34, 1], [32, 20, .62], [48, 9, .36]].map(([dy, hw, o], i) => `<path class="s ln refl" pathLength="1" style="--d:${1.5 + i * .16}s;--t:.6s;--ro:${o};--rd:${i * .45}s" d="M${sx - hw * k} ${hy + dy * k}H${sx + hw * k}"/>`).join('')}
   ${bird(sx - 3.4 * R, hy - 1.35 * R, .62 * k)}${bird(sx - 5 * R, hy - 2.15 * R, .42 * k)}`;
   const halo = $('.halo', sec); halo.style.left = sx + 'px'; halo.style.top = hy + 'px';
-  // the water photo (placeholder: rights unresolved) moved 11-25 from under the horizon to the wave pool section (#say), on Austin's note; plain opacity + mask, no blend modes
-  const pool = $('#say'); if (pool && !$('.sea', pool)) { const sea = document.createElement('div'); sea.className = 'sea'; sea.setAttribute('aria-hidden', 'true'); pool.insertBefore(sea, pool.firstChild) }
+  // the water (ripple) photo under the horizon as texture (placeholder: rights unresolved); back here 11-25 after the wave pool was removed. Plain opacity + mask, no blend modes
+  let sea = $('.sea', sec); if (!sea) { sea = document.createElement('div'); sea.className = 'sea'; sea.setAttribute('aria-hidden', 'true'); sec.insertBefore(sea, sec.firstChild) } sea.style.top = hy + 'px';
 }
 
 /* ---------- the way: one line winds down the page; the white board rides it as you scroll (style frames R1-R3) ---------- */
@@ -428,6 +442,9 @@ function endcap() { const cap = $('.endcap'); if (!cap) return; const h = $('.hd
 function layout(play) { branches(); hero(play); horizon(); endcap(); fit(); way(); tick() }
 function init() {
   const cl = $('#clients'); if (cl && window.AM_LOGOS) cl.innerHTML = CLIENTS.map(k => { const l = AM_LOGOS[k]; if (!l) return ''; const w = Math.round((phone() ? 40 : 50) * Math.pow(l.w / l.h, .62)); return `<span title="${l.name}"><svg role="img" aria-label="${l.name}" width="${w}" height="${Math.round(w * l.h / l.w)}" viewBox="0 0 ${l.w} ${l.h}"><path transform="${l.t}" d="${l.d}"/></svg></span>` }).join('');
+  // the underwater-sand clip (amigosd.com text texture) behind the client logos, faint, plays only while on screen (no blend modes)
+  const cs = cl && cl.closest('section'); if (cs && !$('.sandv', cs)) { const sv = document.createElement('video'); sv.className = 'sandv'; sv.muted = true; sv.loop = true; sv.playsInline = true; sv.setAttribute('playsinline', ''); sv.setAttribute('aria-hidden', 'true'); sv.preload = 'metadata'; sv.poster = 'assets/clips/sand.jpg'; sv.src = 'assets/clips/sand.mp4'; cs.insertBefore(sv, cs.firstChild);
+    if (!RM && 'IntersectionObserver' in window) new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? sv.play().catch(() => { }) : sv.pause()), { rootMargin: '100px' }).observe(cs) }
   $$('[data-work]').forEach(w => w.innerHTML = w.dataset.work.split(',').map(s => { const [k, c] = s.split(':'); return piece(k, c) }).join(''));
   $$('[data-doors]').forEach(w => w.innerHTML = w.dataset.doors.split(',').map(k => door(k, 'specialty.html#' + k)).join(''));
   specialty();
