@@ -6,6 +6,7 @@
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const NS = 'http://www.w3.org/2000/svg';
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const COARSE = matchMedia('(pointer: coarse)').matches;
 document.documentElement.classList.add('js');
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -292,7 +293,8 @@ function tick() {
   if (y <= w.y0) tgt = 0;
   else if (y >= w.yEnd) tgt = Math.min(w.len, w.lenMain + (y - w.yEnd) * 1.4);
   else { let a = 0, b = w.ys.length - 1; while (b - a > 1) { const c = (a + b) >> 1; w.ys[c] < y ? a = c : b = c } const r = (y - w.ys[a]) / Math.max(.001, w.ys[b] - w.ys[a]); tgt = (a + clamp(r)) * w.step }
-  if (RM) { cur = tgt; paint() } else if (!wraf) wraf = requestAnimationFrame(glide);
+  // phones: the board tracks the scroll directly (the eased glide read as lag on touch scrolling)
+  if (RM || COARSE) { cur = tgt; if (!wraf) wraf = requestAnimationFrame(() => { wraf = 0; paint() }) } else if (!wraf) wraf = requestAnimationFrame(glide);
 }
 function glide() { wraf = 0; cur += (tgt - cur) * .13; if (Math.abs(tgt - cur) < .4) cur = tgt; paint(); if (cur !== tgt) wraf = requestAnimationFrame(glide) }
 function spray(now) {
