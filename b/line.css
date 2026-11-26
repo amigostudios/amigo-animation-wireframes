@@ -392,3 +392,6 @@ section[data-ground]{background-blend-mode:normal}
 .who .face img{max-width:none}
 /* Austin 11-25: bird flapping and reflection shimmer looked odd. Both are still again. */
 #hz .bird,.risen #hz .bird path,.risen #hz .refl{animation:none}
+
+/* ---- v16: phones: board + spray in a screen-fixed layer (late iOS scroll updates can't carry it off screen) ---- */
+#rider.fx,#spray.fx{position:fixed;left:0;top:0;z-index:3}

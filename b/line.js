@@ -304,12 +304,17 @@ function way() {
   svg.innerHTML = '<defs>' + ['black', 'night', 'sea', 'terra', 'tan', 'paper'].map(g => `<clipPath id="wc-${g}">${secs.filter(s => s.dataset.ground === g).map(s => `<rect x="-40" y="${s.offsetTop}" width="${W + 80}" height="${s.offsetHeight}"/>`).join('')}</clipPath>`).join('') + '</defs>'
     + ['black', 'night', 'sea', 'terra', 'tan', 'paper'].map(g => `<g data-ground="${g}" clip-path="url(#wc-${g})"><path class="dots" d="${full}"/>${marks}<path class="s sol" d="${full}"/></g>`).join('');
   const m = el('path', { d: main }), f = $('.sol', svg), lenMain = m.getTotalLength(), len = f.getTotalLength(), step = 3, ys = [];
-  for (let l = 0; l <= lenMain; l += step) ys.push(f.getPointAtLength(l).y);
+  const n = Math.ceil(len / step) + 1, T = new Float32Array(n * 2);
+  for (let i = 0; i < n; i++) { const q = f.getPointAtLength(Math.min(len, i * step)); T[i * 2] = q.x; T[i * 2 + 1] = q.y; if (i * step <= lenMain) ys.push(q.y) }
+  // phones: board + spray sit in a screen-fixed layer on <body>, so a late scroll update can never carry the board off screen
+  const host = COARSE ? document.body : page;
   let rider = $('#rider'), spr = $('#spray');
-  if (!rider) { rider = document.createElement('div'); rider.id = 'rider'; rider.dataset.ground = 'black'; rider.innerHTML = `<svg class="art" width="52" height="16" viewBox="-26 -8 52 16" aria-hidden="true"><path class="f bd" d="${D(boardPts(46))}Z"/></svg>`; page.appendChild(rider) }
-  if (!spr) { spr = el('svg', { id: 'spray', class: 'art', width: 1, height: 1, 'aria-hidden': 'true' }); spr.dataset.ground = 'black'; page.appendChild(spr) }
-  spr.innerHTML = '';
-  WAY = { secs, f, sols: $$('.sol', svg), rider, spray: spr, lenMain, len, step, ys, y0: ys[0], yEnd }; PARTS = [];
+  if (!rider) { rider = document.createElement('div'); rider.id = 'rider'; rider.dataset.ground = 'black'; rider.innerHTML = `<svg class="art" width="52" height="16" viewBox="-26 -8 52 16" aria-hidden="true"><path class="f bd" d="${D(boardPts(46))}Z"/></svg>`; host.appendChild(rider) }
+  if (!spr) { spr = COARSE ? document.createElement('canvas') : el('svg', { id: 'spray', class: 'art', width: 1, height: 1, 'aria-hidden': 'true' }); spr.id = 'spray'; spr.setAttribute('aria-hidden', 'true'); spr.dataset.ground = 'black'; host.appendChild(spr) }
+  if (COARSE) { rider.classList.add('fx'); spr.classList.add('fx'); const dp = Math.min(2, devicePixelRatio || 1); spr.width = Math.round(innerWidth * dp); spr.height = Math.round(Math.max(innerHeight, screen.height || 0) * dp); spr.style.width = innerWidth + "px"; spr.style.height = Math.max(innerHeight, screen.height || 0) + "px"; spr._dp = dp; spr.getContext('2d').clearRect(0, 0, spr.width, spr.height) }
+  else spr.innerHTML = '';
+  const pr = page.getBoundingClientRect();
+  WAY = { secs, f, sols: $$('.sol', svg), rider, spray: spr, lenMain, len, step, ys, y0: ys[0], yEnd, T, n, pl: pr.left + scrollX, pt: pr.top + scrollY, tops: secs.map(s => s.offsetTop), Hp }; PARTS = [];
   $$('.sol', svg).forEach(p => p.style.background = 'none'); $$('#way g').forEach(g => g.style.background = 'none');
 }
 function tick() {
@@ -319,26 +324,38 @@ function tick() {
   else if (y >= w.yEnd) tgt = Math.min(w.len, w.lenMain + (y - w.yEnd) * 1.4);
   else { let a = 0, b = w.ys.length - 1; while (b - a > 1) { const c = (a + b) >> 1; w.ys[c] < y ? a = c : b = c } const r = (y - w.ys[a]) / Math.max(.001, w.ys[b] - w.ys[a]); tgt = (a + clamp(r)) * w.step }
   // phones: the board tracks the scroll directly (the eased glide read as lag on touch scrolling)
-  if (RM || COARSE) { cur = tgt; if (!wraf) wraf = requestAnimationFrame(() => { wraf = 0; paint() }) } else if (!wraf) wraf = requestAnimationFrame(glide);
+  if (RM || COARSE) { cur = tgt; paint() } else if (!wraf) wraf = requestAnimationFrame(glide);
 }
+let fraf = 0, fy = -1, fidle = 0;
+function follow() { fidle = 0; if (!fraf) fraf = requestAnimationFrame(fstep) }
+function fstep() { fraf = 0; if (scrollY !== fy) { fy = scrollY; fidle = 0; tick() } else fidle++; if (fidle < 30) fraf = requestAnimationFrame(fstep) }
 function glide() { wraf = 0; cur += (tgt - cur) * .13; if (Math.abs(tgt - cur) < .4) cur = tgt; paint(); if (cur !== tgt) wraf = requestAnimationFrame(glide) }
 function spray(now) {
   const dt = Math.min(.05, (now - sT) / 1000); sT = now;
+  if (COARSE) {
+    const cv = WAY && WAY.spray, x = cv && cv.getContext('2d'); if (!x) { PARTS = []; sraf = 0; return }
+    const [ox, oy] = off(), dp = cv._dp, dark = cv.dataset.ground === 'paper' || cv.dataset.ground === 'tan';
+    x.setTransform(dp, 0, 0, dp, 0, 0); x.clearRect(0, 0, cv.width, cv.height); x.fillStyle = '#FCFAF5'; x.strokeStyle = '#1E150F'; x.lineWidth = 1;
+    PARTS = PARTS.filter(p => { p.t += dt; if (p.t >= p.life) return false; const k = Math.pow(.04, dt); p.vx *= k; p.vy = p.vy * k + 90 * dt; p.x += p.vx * dt; p.y += p.vy * dt; const u = p.t / p.life; x.globalAlpha = 1 - u * u; x.beginPath(); x.arc(p.x + ox, p.y + oy, p.r, 0, 6.2832); x.fill(); if (dark) x.stroke(); return true });
+    x.globalAlpha = 1; sraf = PARTS.length ? requestAnimationFrame(spray) : (x.clearRect(0, 0, cv.width, cv.height), 0); return
+  }
   PARTS = PARTS.filter(p => { p.t += dt; if (p.t >= p.life || !p.c.isConnected) { if (p.c.parentNode) p.c.parentNode.removeChild(p.c); return false } const k = Math.pow(.04, dt); p.vx *= k; p.vy = p.vy * k + 90 * dt; p.x += p.vx * dt; p.y += p.vy * dt; const u = p.t / p.life; p.c.setAttribute('cx', p.x.toFixed(1)); p.c.setAttribute('cy', p.y.toFixed(1)); p.c.style.opacity = (1 - u * u).toFixed(2); return true });
   sraf = PARTS.length ? requestAnimationFrame(spray) : 0;
 }
+function at(L) { const w = WAY, u = clamp(L, 0, w.len) / w.step, i = Math.min(w.n - 2, Math.floor(u)), r = u - i, T = w.T; return { x: T[i * 2] + (T[i * 2 + 2] - T[i * 2]) * r, y: T[i * 2 + 1] + (T[i * 2 + 3] - T[i * 2 + 1]) * r } }
+function off() { const w = WAY; return COARSE ? [w.pl - scrollX, w.pt - scrollY] : [0, 0] }
 function paint() {
-  const w = WAY, L = clamp(cur, 0, w.len), a = w.f.getPointAtLength(Math.max(0, L - 2)), b = w.f.getPointAtLength(Math.min(w.len, L + 2)), pt = w.f.getPointAtLength(L);
+  const w = WAY, L = clamp(cur, 0, w.len), a = at(Math.max(0, L - 3)), b = at(Math.min(w.len, L + 3)), pt = at(L), [ox0, oy0] = off();
   const drawn = Math.max(0, L - 30);
   const ink = () => w.sols.forEach(p => { if (drawn <= 0) { p.style.visibility = 'hidden' } else { p.style.visibility = ''; p.style.strokeDasharray = drawn + ' ' + (w.len + 60) } });
   if (COARSE) { clearTimeout(w.inkT); w.inkT = setTimeout(ink, 140) } else ink();
-  w.rider.style.transform = `translate3d(${pt.x.toFixed(1)}px,${pt.y.toFixed(1)}px,0) rotate(${(Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI).toFixed(1)}deg)`;
-  let g = 'black'; w.secs.forEach(s => { if (pt.y >= s.offsetTop) g = s.dataset.ground }); w.rider.dataset.ground = g; w.spray.dataset.ground = g;
+  w.rider.style.transform = `translate3d(${(pt.x + ox0).toFixed(1)}px,${(pt.y + oy0).toFixed(1)}px,0) rotate(${(Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI).toFixed(1)}deg)`;
+  let g = 'black'; w.secs.forEach((s, i) => { if (pt.y >= w.tops[i]) g = s.dataset.ground }); w.rider.dataset.ground = g; w.spray.dataset.ground = g;
   // spray: when the board turns hard, dots fly off the tail on the outside of the turn
   const hd = Math.atan2(b.y - a.y, b.x - a.x), dL = L - pL; let dA = pAng == null ? 0 : hd - pAng; dA = Math.atan2(Math.sin(dA), Math.cos(dA)); pAng = hd; pL = L;
   if (!RM && Math.abs(dA) > .028 && Math.abs(dL) > 2.5 && L < w.lenMain - 4) {
     const dir = Math.sign(dL), fx = Math.cos(hd) * dir, fy = Math.sin(hd) * dir, sd = -Math.sign(dA) * dir, ox = -fy * sd, oy = fx * sd, n = Math.min(4, Math.ceil(Math.abs(dA) * 22)), sp = Math.min(190, 50 + Math.abs(dL) * 7);
-    for (let i = 0; i < n && PARTS.length < 70; i++) { const q = Math.random(), r = Math.random(), c = el('circle', { r: (.9 + r * 1.5).toFixed(2) }, w.spray); PARTS.push({ c, x: pt.x - fx * (14 + q * 10) + ox * 3, y: pt.y - fy * (14 + q * 10) + oy * 3, vx: ox * sp * (.45 + r * .8) - fx * sp * (.1 + q * .35), vy: oy * sp * (.45 + r * .8) - fy * sp * (.1 + q * .35), t: 0, life: .45 + q * .55 }) }
+    for (let i = 0; i < n && PARTS.length < 70; i++) { const q = Math.random(), r = Math.random(), c = COARSE ? null : el('circle', { r: (.9 + r * 1.5).toFixed(2) }, w.spray); PARTS.push({ c, r: .9 + r * 1.5, x: pt.x - fx * (14 + q * 10) + ox * 3, y: pt.y - fy * (14 + q * 10) + oy * 3, vx: ox * sp * (.45 + r * .8) - fx * sp * (.1 + q * .35), vy: oy * sp * (.45 + r * .8) - fy * sp * (.1 + q * .35), t: 0, life: .45 + q * .55 }) }
     if (!sraf) { sT = performance.now(); sraf = requestAnimationFrame(spray) }
   }
   const hz = $('#start'); if (hz && L >= w.lenMain - 2) hz.classList.add('risen');
@@ -417,8 +434,9 @@ function init() {
   }
   const rp = $('.replay'); if (rp) rp.addEventListener('click', () => hero(true));
   const fm = $('#fm'); if (fm) fm.addEventListener('submit', e => { e.preventDefault(); fm.hidden = true; $('#thanks').hidden = false });
-  let rt, lw = innerWidth, lh = innerHeight; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (innerWidth !== lw || (innerWidth >= 700 && Math.abs(innerHeight - lh) > 60)) { lw = innerWidth; lh = innerHeight; layout(false) } else { way(); tick() } }, 160) });
-  let q = false; addEventListener('scroll', () => { if (!q) { q = true; requestAnimationFrame(() => { q = false; tick() }) } }, { passive: true });
+  let rt, lw = innerWidth, lh = innerHeight; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (innerWidth !== lw || (innerWidth >= 700 && Math.abs(innerHeight - lh) > 60)) { lw = innerWidth; lh = innerHeight; layout(false) } else { const pg = $('.page'); if (!WAY || !pg || Math.abs(pg.offsetHeight - WAY.Hp) > 2) way(); else { const r = pg.getBoundingClientRect(); WAY.pl = r.left + scrollX; WAY.pt = r.top + scrollY } tick() } }, 160) });
+  let q = false; addEventListener('scroll', () => { if (COARSE) return follow(); if (!q) { q = true; requestAnimationFrame(() => { q = false; tick() }) } }, { passive: true });
+  if (COARSE) ['touchstart', 'touchmove'].forEach(e => addEventListener(e, follow, { passive: true }));
   addEventListener('load', () => { fit(); way(); tick() });
   addEventListener('hashchange', () => { if ($('#spec')) { specialty(); ground(document.querySelector('.grounds button[data-m][aria-pressed="true"]').dataset.m); layout(false); wire() } });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (WORD !== 'line') { const go = () => layout(false); document.fonts.load(`100px "${FONTS[WORD]}"`, 'Motion').then(go, go) } else { fit(); way(); tick() } });
