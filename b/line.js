@@ -328,8 +328,14 @@ function way() {
   WAY = { secs, f, sols: $$('.sol', svg), rider, spray: spr, lenMain, len, step, ys, y0: ys[0], yEnd, T, n, pl: pr.left + scrollX, pt: pr.top + scrollY, tops: secs.map(s => s.offsetTop), Hp }; PARTS = [];
   $$('.sol', svg).forEach(p => p.style.background = 'none'); $$('#way g').forEach(g => g.style.background = 'none');
 }
+// header photo parallax: the photo drifts down at ~30% of the scroll speed while the header is on screen (moves a layer inside a square clip, no rounded clip)
+let WALL = null, wPy = -1;
+function parallax() {
+  if (RM) return; const w = WALL || (WALL = $('.wall')); if (!w) return;
+  const hh = w.offsetHeight, y = Math.min(scrollY, hh + 200), py = Math.round(Math.min(y * .3, hh * .3)); if (py === wPy) return; wPy = py; w.style.setProperty('--py', py + 'px');
+}
 function tick() {
-  if (!WAY) return;
+  parallax(); if (!WAY) return;
   const max = document.documentElement.scrollHeight - innerHeight, p = max > 0 ? clamp(scrollY / max) : 0, y = scrollY + innerHeight * (.36 + .46 * p), w = WAY;
   if (y <= w.y0) tgt = 0;
   else if (y >= w.yEnd) tgt = Math.min(w.len, w.lenMain + (y - w.yEnd) * 1.4);
@@ -435,12 +441,12 @@ function init() {
   const setWord = (v, go) => { WORD = v; $$('.grounds button[data-w]').forEach(b => b.setAttribute('aria-pressed', b.dataset.w === v)); try { localStorage.setItem('amigo-b-word', v) } catch (e) { } if (go) { const run = () => { scrollTo(0, 0); hero(true); way(); tick() }; v !== 'line' && document.fonts && document.fonts.load ? document.fonts.load(`100px "${FONTS[v]}"`, 'Motion').then(run, run) : run() } };
   $$('.grounds button[data-w]').forEach(b => b.addEventListener('click', () => setWord(b.dataset.w, true))); setWord(WORD, false);
   const ob = $('.optbtn'); if (ob) ob.addEventListener('click', () => { const on = document.body.classList.toggle('opts'); ob.setAttribute('aria-expanded', on); ob.textContent = on ? 'Close' : 'Options' });
-  // header: the underwater-sand clip (amigosd.com text texture) replaced the studio photo 11-25; new key so everyone starts on Sand
-  let PH0 = 'sand'; try { PH0 = localStorage.getItem('amigo-b-photo2') || PH0 } catch (e) { } if (!['sand', 'water', 'off'].includes(PH0)) PH0 = 'sand';
-  const setPhoto = v => { const w = $('.wall'); if (w) { w.dataset.p = v; w.style.backgroundImage = v === 'off' || v === 'sand' ? 'none' : `url(assets/${v}.jpg)`;
+  // header: Austin went back to the studio photo 11-25 (sand clip kept as an option), now with scroll parallax; new key so everyone starts on Studio
+  let PH0 = 'studio'; try { PH0 = localStorage.getItem('amigo-b-photo3') || PH0 } catch (e) { } if (!['studio', 'sand', 'water', 'off'].includes(PH0)) PH0 = 'studio';
+  const setPhoto = v => { const w = $('.wall'); if (w) { w.dataset.p = v; w.style.backgroundImage = 'none'; w.style.setProperty('--wimg', v === 'off' || v === 'sand' ? 'none' : `url(assets/${v}.jpg)`);
       let sv = $('.wallv'); if (v === 'sand' && !sv) { sv = document.createElement('video'); sv.className = 'wallv'; sv.muted = true; sv.loop = true; sv.playsInline = true; sv.setAttribute('playsinline', ''); sv.setAttribute('aria-hidden', 'true'); sv.preload = 'auto'; sv.poster = 'assets/clips/sand.jpg'; sv.src = 'assets/clips/sand.mp4'; w.parentNode.insertBefore(sv, w);
         if (!RM && 'IntersectionObserver' in window) new IntersectionObserver(es => es.forEach(e => { if (sv.hidden) return; e.isIntersecting ? sv.play().catch(() => { }) : sv.pause() })).observe(w.parentNode) }
-      if (sv) { sv.hidden = v !== 'sand'; if (sv.hidden) sv.pause(); else if (!RM) sv.play().catch(() => { }) } } $$('.grounds button[data-p]').forEach(b => b.setAttribute('aria-pressed', b.dataset.p === v)); try { localStorage.setItem('amigo-b-photo2', v) } catch (e) { } };
+      if (sv) { sv.hidden = v !== 'sand'; if (sv.hidden) sv.pause(); else if (!RM) sv.play().catch(() => { }) } } $$('.grounds button[data-p]').forEach(b => b.setAttribute('aria-pressed', b.dataset.p === v)); try { localStorage.setItem('amigo-b-photo3', v) } catch (e) { } };
   $$('.grounds button[data-p]').forEach(b => b.addEventListener('click', () => setPhoto(b.dataset.p))); setPhoto(PH0);
   ground(m); wake(); layout(true); wire(); live(); glows();
   const reel = $('.reel'); if (reel) {
