@@ -288,8 +288,8 @@ function horizon() {
   ${[[16, 34, 1], [32, 20, .62], [48, 9, .36]].map(([dy, hw, o], i) => `<path class="s ln refl" pathLength="1" style="--d:${1.5 + i * .16}s;--t:.6s;--ro:${o};--rd:${i * .45}s" d="M${sx - hw * k} ${hy + dy * k}H${sx + hw * k}"/>`).join('')}
   ${bird(sx - 3.4 * R, hy - 1.35 * R, .62 * k)}${bird(sx - 5 * R, hy - 2.15 * R, .42 * k)}`;
   const halo = $('.halo', sec); halo.style.left = sx + 'px'; halo.style.top = hy + 'px';
-  // the water photo sits under the horizon as texture (placeholder: rights unresolved); plain opacity + mask, no blend modes
-  let sea = $('.sea', sec); if (!sea) { sea = document.createElement('div'); sea.className = 'sea'; sea.setAttribute('aria-hidden', 'true'); sec.insertBefore(sea, sec.firstChild) } sea.style.top = hy + 'px';
+  // the water photo (placeholder: rights unresolved) moved 11-25 from under the horizon to the wave pool section (#say), on Austin's note; plain opacity + mask, no blend modes
+  const pool = $('#say'); if (pool && !$('.sea', pool)) { const sea = document.createElement('div'); sea.className = 'sea'; sea.setAttribute('aria-hidden', 'true'); pool.insertBefore(sea, pool.firstChild) }
 }
 
 /* ---------- the way: one line winds down the page; the white board rides it as you scroll (style frames R1-R3) ---------- */
