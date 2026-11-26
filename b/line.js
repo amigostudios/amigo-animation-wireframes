@@ -386,7 +386,7 @@ function init() {
   try { TOP = localStorage.getItem('amigo-b-top') || TOP } catch (e) { } if (!['curve', 'wave', 'sun'].includes(TOP)) TOP = 'curve';
   const setTop = (v, go) => { TOP = v; $$('.grounds button[data-v]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); try { localStorage.setItem('amigo-b-top', v) } catch (e) { } if (go) { scrollTo(0, 0); hero(true); way(); tick() } };
   $$('.grounds button[data-v]').forEach(b => b.addEventListener('click', () => setTop(b.dataset.v, true))); setTop(TOP, false);
-  try { WORD = localStorage.getItem('amigo-b-word') || WORD } catch (e) { } if (!['line', 'script', 'brush'].includes(WORD)) WORD = 'line';
+  try { WORD = localStorage.getItem('amigo-b-word') || WORD } catch (e) { } WORD = 'line'; // Austin picked Line 11-25; script code kept for reference
   const setWord = (v, go) => { WORD = v; $$('.grounds button[data-w]').forEach(b => b.setAttribute('aria-pressed', b.dataset.w === v)); try { localStorage.setItem('amigo-b-word', v) } catch (e) { } if (go) { const run = () => { scrollTo(0, 0); hero(true); way(); tick() }; v !== 'line' && document.fonts && document.fonts.load ? document.fonts.load(`100px "${FONTS[v]}"`, 'Motion').then(run, run) : run() } };
   $$('.grounds button[data-w]').forEach(b => b.addEventListener('click', () => setWord(b.dataset.w, true))); setWord(WORD, false);
   const ob = $('.optbtn'); if (ob) ob.addEventListener('click', () => { const on = document.body.classList.toggle('opts'); ob.setAttribute('aria-expanded', on); ob.textContent = on ? 'Close' : 'Options' });
