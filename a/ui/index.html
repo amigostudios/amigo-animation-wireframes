@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>UI and explainers · Amigo Animation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../shared/site.css?v=1795750983">
+<style>
+/* signature: a drawn desktop. Dock icons open windows, each window plays one kind of UI film. Windows drag. */
+.desk{position:relative;aspect-ratio:16/8.4;max-height:820px;width:100%;overflow:hidden;background:var(--raise);touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.wall{position:absolute;inset:0;pointer-events:none}
+.wall i{position:absolute;background:#333130}
+.wall .a{left:-6%;bottom:-18%;width:38%;aspect-ratio:1;border-radius:50%}
+.wall .b{right:8%;top:14%;width:22%;aspect-ratio:1;border-radius:999px 999px 0 0;background:#302E2D}
+.wall .c{right:-4%;bottom:-10%;width:30%;aspect-ratio:1;border-radius:100% 0 0 0;background:#363432}
+.menu{position:absolute;left:0;right:0;top:0;height:38px;background:var(--deep);display:flex;align-items:center;gap:22px;padding:0 16px;font-size:14px;font-weight:500;z-index:5}
+.menu b{font-weight:700}.menu span{color:var(--dim)}.menu .r{margin-left:auto}
+.menu .m{width:22px;height:21px;display:block}.menu .m svg{width:100%;height:100%;display:block}
+.win{position:absolute;background:var(--deep);border-radius:12px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.45);display:none;will-change:transform}
+.win.on{display:block}
+.win .tb{height:36px;display:flex;align-items:center;gap:8px;padding:0 12px;cursor:grab;touch-action:none;background:#242322;font-size:14px;font-weight:500;color:var(--dim)}
+.win .tb:active{cursor:grabbing}
+.win .tb button{width:14px;height:14px;border-radius:50%;border:0;padding:0;background:#55524E;cursor:pointer;position:relative;transition:background .18s,transform .3s var(--spring)}
+.win .tb button::after{content:"";position:absolute;inset:-12px}
+.win .tb button:hover{background:var(--terra);transform:scale(1.25)}
+.win .tb i{width:14px;height:14px;border-radius:50%;background:#3A3836}
+.win .tb span{margin-left:8px}
+.win.top .tb{background:#34322F;color:var(--ink)}
+.win canvas,.win video{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
+.dock{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:10px;padding:10px;background:rgba(22,21,20,.9);border-radius:22px;z-index:9999}
+.dock button{width:58px;height:58px;border-radius:14px;border:0;background:#34322F;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:transform .4s var(--spring),background .2s}
+.dock button i{display:block;width:30px;height:30px;background:#8D8983;transition:border-radius .5s var(--spring),transform .5s var(--spring),background .2s}
+.dock button:hover{transform:translateY(-8px) scale(1.08);background:var(--terra)}.dock button:hover i{background:var(--cream)}
+.dock button::after{content:"";position:absolute;bottom:-7px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--cream);opacity:0;transition:opacity .2s}
+.dock button.on::after{opacity:1}
+.dock .i0{border-radius:15px 15px 0 0}.dock button.on .i0{border-radius:15px}
+.dock .i1{border-radius:15px;height:15px!important}.dock button.on .i1{height:30px!important;border-radius:0 0 100% 0}
+.dock .i2{border-radius:50%}.dock button.on .i2{border-radius:0 15px 15px 15px;transform:rotate(90deg)}
+.dock .i3{border-radius:0 100% 0 0}.dock button.on .i3{border-radius:15px 15px 0 0}
+@media(max-width:760px){.desk{aspect-ratio:3/4.5}.menu span:not(.r){display:none}.dock button{width:50px;height:50px}.win .tb{height:34px}}
+
+/* signature (default since 11-25): "Now playing". The films play one after another on one screen; the list
+   beside it shows which one is on and how far along it is. Click a row to jump. Nothing to figure out. */
+.np{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.15fr);gap:clamp(18px,2.6vw,44px);align-items:center;padding:clamp(22px,3.4vw,56px) var(--gutr) clamp(26px,3.4vw,56px) var(--gut)}
+.np ol{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.np li button{all:unset;box-sizing:border-box;position:relative;overflow:hidden;display:grid;grid-template-columns:34px minmax(0,1fr) auto;column-gap:16px;row-gap:2px;align-items:center;width:100%;padding:18px 20px 21px;border-radius:14px;background:var(--raise);cursor:pointer;transition:background .25s,transform .45s var(--out)}
+.np li button:hover{background:#34322F;transform:translateX(4px)}
+.np li button:focus-visible{outline:2px solid var(--terra);outline-offset:3px}
+.np li i{grid-row:1/3;display:block;width:30px;height:30px;background:#6E6A65;transition:border-radius .6s var(--spring),transform .6s var(--spring),background .25s,height .6s var(--spring)}
+.np li b{font-weight:700;font-size:clamp(15px,1.25vw,19px);line-height:1.25;color:var(--dim);transition:color .25s}
+.np li span{grid-column:2;font-size:14px;color:var(--dim);opacity:.8}
+.np li em{grid-row:1/3;grid-column:3;font-style:normal;font-size:13px;font-weight:500;letter-spacing:.08em;color:var(--dim);opacity:.7}
+.np li u{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--line);text-decoration:none;opacity:0;transition:opacity .25s}
+.np li u::after{content:"";position:absolute;inset:0;background:var(--terra);transform-origin:0 50%;transform:scaleX(var(--p,0))}
+.np li.on button{background:#34322F}
+.np li.on b{color:var(--ink)}.np li.on i{background:var(--terra)}.np li.on u{opacity:1}.np li.on em{color:var(--cream);opacity:1}
+.np .i0{border-radius:15px 15px 0 0}.np li.on .i0{border-radius:15px}
+.np .i1{border-radius:15px;height:15px}.np li.on .i1{height:30px;border-radius:0 0 100% 0}
+.np .i2{border-radius:50%}.np li.on .i2{border-radius:0 15px 15px 15px;transform:rotate(90deg)}
+.np .i3{border-radius:0 100% 0 0}.np li.on .i3{border-radius:15px 15px 0 0}
+.np .screen{background:#242322;border-radius:14px;overflow:hidden;box-shadow:0 22px 60px rgba(0,0,0,.5)}
+.np .tb{height:40px;display:flex;align-items:center;gap:8px;padding:0 8px 0 14px;font-size:14px;font-weight:500;color:var(--ink)}
+.np .tb>i{width:12px;height:12px;border-radius:50%;background:#3A3836}
+.np .tb>span{margin-left:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np .tb button{margin-left:auto;border:0;background:none;color:var(--dim);font:inherit;font-size:13px;padding:6px 10px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .2s,color .2s}
+.np .tb button:hover{background:#34322F;color:var(--ink)}
+.np .tb button svg{width:11px;height:11px;display:block}
+.np .stage{position:relative;aspect-ratio:16/9;background:#0E0D0C}
+.np .stage video,.np .stage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.035);transition:opacity .5s,transform .9s var(--out)}
+.np .stage .on{opacity:1;transform:none}
+@media(max-width:760px){.np{grid-template-columns:1fr}.np .screen{order:-1}.np ol{gap:8px}.np li button{padding:13px 14px 16px;column-gap:13px}.np li button:hover{transform:none}.np li i{width:24px;height:24px}.np .i1{height:12px}.np li.on .i1{height:24px}}
+@media(prefers-reduced-motion:reduce){.np .stage video,.np .stage canvas,.np li i,.np li button{transition-duration:.2s;transform:none}}
+</style>
+</head>
+<body>
+<div id="page"></div>
+<script src="../shared/data.js?v=1795750983"></script>
+<script src="../shared/kit.js?v=1795750983"></script>
+<script src="../shared/viewer.js?v=1795750983"></script>
+<script src="../shared/spec.js?v=1795750983"></script>
+<script>
+const W=Kit.WORK,APPS=[['Workcloud Scheduling',W.zebra_scheduling],['Workcloud Inventory Visibility',W.zebra_inventory],['Hook to Wormhole',W.jiffy_hook],['Workcloud Timekeeping',W.zebra_timekeeping]];
+/* ?sig=desk brings back the first idea (a drawn desktop with windows you drag). Austin, 11-25: nice idea,
+   but people would not work out what to do. The default is now "Now playing", which runs by itself. */
+const DESK=new URLSearchParams(location.search).get('sig')==='desk';
+const pauseIcon='<svg viewBox="0 0 11 11" aria-hidden="true"><path fill="currentColor" d="M1 0h3v11H1zM7 0h3v11H7z"></path></svg>',playIcon='<svg viewBox="0 0 11 11" aria-hidden="true"><path fill="currentColor" d="M1.5 0l9 5.5-9 5.5z"></path></svg>';
+const deskSig=`<div class="desk" id="desk"><div class="wall" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i></div>
+    <div class="menu"><span class="m" data-logo="22"></span><b>Amigo</b><span>File</span><span>Edit</span><span>View</span><span class="r">Placeholder picks</span></div>
+    ${APPS.map((a,i)=>`<div class="win" data-i="${i}" role="group" aria-label="${a[0]} window"><div class="tb"><button type="button" aria-label="Close ${a[0]}"></button><i></i><i></i><span>${a[0]} · ${a[1].credit}</span></div><canvas></canvas></div>`).join('')}
+    <div class="dock" role="toolbar" aria-label="Files">${APPS.map((a,i)=>`<button type="button" data-i="${i}" aria-label="Open ${a[0]}" aria-pressed="false"><i class="i${i}"></i></button>`).join('')}</div></div>`;
+const playSig=`<div class="np" id="np">
+    <ol>${APPS.map((a,i)=>`<li><button type="button" data-i="${i}" aria-label="Play ${a[0]}, ${a[1].credit}"><i class="i${i}"></i><b>${a[0]}</b><span>${a[1].credit}</span><em>0${i+1}</em><u></u></button></li>`).join('')}</ol>
+    <div class="screen"><div class="tb"><i></i><i></i><i></i><span id="np-t"></span><button type="button" id="np-pp">${pauseIcon}<span>Pause</span></button></div>
+      <div class="stage">${APPS.map(()=>'<canvas></canvas>').join('')}</div></div></div>`;
+const S=Spec.build({key:'ui',title:'UI + EXPLAINERS',seed:9,
+  reel:[{k:'ui',p:0},{k:'chart',p:0},{k:'flow',p:0}],
+  sigTitle:DESK?'On the desktop':'Now playing',sigNote:DESK?'Open the files, drag them around':'Plays on its own. Pick one to jump.',
+  sig:DESK?deskSig:playSig,
+  workNote:'Placeholder picks, one drawn stand-in',work:[W.zebra_inventory,W.zebra_timekeeping,W.zebra_scheduling,W.jiffy_hook,W.jiffy_starborn,{k:'chart',p:0}]});
+if(!S.simple){/* the signature section only runs with ?v=full */
+if(DESK){
+const desk=S.$('#desk'),wins=S.$$('.win'),icons=S.$$('.dock button'),arts=wins.map((w,i)=>Kit.media(w.querySelector('canvas'),APPS[i][1]));let z=10;
+/* where each window sits, as shares of the desktop: [left, top, width] for wide and for phone */
+const SPOT={wide:[[.05,.1,.42],[.52,.17,.4],[.24,.36,.33],[.6,.08,.33]],phone:[[.04,.07,.78],[.18,.25,.78],[.06,.44,.74],[.2,.14,.74]]};
+function place(i){const w=wins[i],ph=desk.clientWidth<700,s=SPOT[ph?'phone':'wide'][i];w.style.width=(s[2]*100)+'%';w.style.left=(s[0]*100)+'%';w.style.top=(s[1]*100)+'%'}
+function front(w){w.style.zIndex=++z;wins.forEach(x=>x.classList.toggle('top',x===w))}
+function from(i){const a=icons[i].getBoundingClientRect(),b=wins[i].getBoundingClientRect();return `translate(${(a.left+a.width/2-b.left-b.width/2).toFixed(1)}px,${(a.top+a.height/2-b.top-b.height/2).toFixed(1)}px) scale(.06)`}
+/* a window grows out of its dock icon and shrinks back into it */
+function openWin(i){const w=wins[i];if(w.classList.contains('on')){front(w);return}place(i);w.classList.add('on');front(w);icons[i].classList.add('on');icons[i].setAttribute('aria-pressed','true');arts[i].size();arts[i].play();
+  if(!Kit.still)w.animate([{transform:from(i),opacity:.2},{transform:'none',opacity:1}],{duration:520,easing:'cubic-bezier(.3,1.35,.5,1)'})}
+function closeWin(i){const w=wins[i];if(!w.classList.contains('on'))return;icons[i].classList.remove('on');icons[i].setAttribute('aria-pressed','false');arts[i].pause();
+  const done=()=>w.classList.remove('on','top');if(Kit.still)done();else w.animate([{transform:'none',opacity:1},{transform:from(i),opacity:.2}],{duration:300,easing:'cubic-bezier(.5,0,.8,.4)'}).onfinish=done}
+icons.forEach((b,i)=>b.addEventListener('click',()=>wins[i].classList.contains('on')&&wins[i].classList.contains('top')?closeWin(i):openWin(i)));
+wins.forEach((w,i)=>{w.querySelector('.tb button').addEventListener('click',e=>{e.stopPropagation();closeWin(i)});w.addEventListener('pointerdown',()=>front(w));
+  const tb=w.querySelector('.tb');let d=null;
+  tb.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;const r=w.getBoundingClientRect(),k=desk.getBoundingClientRect();d={x:e.clientX-r.left,y:e.clientY-r.top,k};tb.setPointerCapture(e.pointerId)});
+  tb.addEventListener('pointermove',e=>{if(!d)return;const k=d.k,x=Kit.clamp(e.clientX-k.left-d.x,-w.offsetWidth*.6,k.width-w.offsetWidth*.4),y=Kit.clamp(e.clientY-k.top-d.y,38,k.height-60);w.style.left=x+'px';w.style.top=y+'px'});
+  const up=()=>{d=null};tb.addEventListener('pointerup',up);tb.addEventListener('pointercancel',up)});
+addEventListener('resize',()=>wins.forEach((w,i)=>{if(w.classList.contains('on'))place(i)}));
+Kit.once(S.$('#sig'),()=>{openWin(0);setTimeout(()=>openWin(1),420);setTimeout(()=>openWin(2),840)},.35);
+}else{
+/* Now playing: one screen, the films run one after another; the list shows which is on and how far along. */
+const rows=S.$$('#np li'),btns=S.$$('#np li button'),label=S.$('#np-t'),pp=S.$('#np-pp'),LEN=8500;
+const arts=S.$$('#np .stage canvas').map((c,i)=>Kit.media(c,APPS[i][1]));
+let cur=-1,paused=false,seen=false,t0=0,held=0;
+arts.forEach((a,i)=>{if(a.v){a.v.loop=false;a.v.addEventListener('ended',()=>{if(cur===i&&!paused)show((i+1)%arts.length)})}});
+function show(i){if(cur>=0){arts[cur].pause();arts[cur].el.classList.remove('on');rows[cur].classList.remove('on');btns[cur].removeAttribute('aria-current');rows[cur].style.setProperty('--p',0)}
+  cur=i;const a=arts[i];if(a.v){try{a.v.currentTime=0}catch(e){}}else{a.size()}t0=performance.now();held=0;
+  a.el.classList.add('on');rows[i].classList.add('on');btns[i].setAttribute('aria-current','true');label.textContent=APPS[i][0]+' · '+APPS[i][1].credit;if(!paused&&seen)a.play()}
+function setPaused(v){paused=v;pp.innerHTML=(v?playIcon:pauseIcon)+`<span>${v?'Play':'Pause'}</span>`;pp.setAttribute('aria-pressed',v);if(cur<0)return;if(v){held=performance.now()-t0;arts[cur].pause()}else{t0=performance.now()-held;arts[cur].play()}}
+btns.forEach((b,i)=>b.addEventListener('click',()=>{if(paused)setPaused(false);show(i)}));
+pp.addEventListener('click',()=>setPaused(!paused));
+/* progress line under the active row; a drawn stand-in (no video) runs on a timer instead */
+(function tick(){if(cur>=0&&seen){const v=arts[cur].v;let p=0;if(v){p=v.duration?v.currentTime/v.duration:0}else if(!paused){p=(performance.now()-t0)/LEN;if(p>=1){show((cur+1)%arts.length);p=0}}else p=held/LEN;rows[cur].style.setProperty('--p',Math.min(1,p).toFixed(3))}requestAnimationFrame(tick)})();
+show(0);if(Kit.still)setPaused(true);
+Kit.once(S.$('#np'),()=>{seen=true;if(!paused)arts[cur].play()},.3);
+}
+}
+</script>
+<script src="../shared/nav.js?v=1795750983"></script>
+</body>
+</html>

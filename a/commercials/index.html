@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Commercials · Amigo Animation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../shared/site.css?v=1795750983">
+<style>
+/* signature: the channel guide. A drawn set on the left, the guide on the right. Each channel is a kind of spot. */
+.guide{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(20px,3vw,48px);padding-top:clamp(28px,4vw,56px);padding-bottom:clamp(28px,4vw,56px);align-items:center}
+.set{background:var(--raise);border-radius:clamp(18px,2.4vw,34px);padding:clamp(12px,1.6vw,22px);display:grid;grid-template-columns:minmax(0,1fr) clamp(54px,7vw,96px);gap:clamp(10px,1.4vw,20px);position:relative}
+.set::before,.set::after{content:"";position:absolute;bottom:-14px;width:9%;height:14px;background:var(--line);border-radius:0 0 8px 8px}.set::before{left:12%}.set::after{right:12%}
+.screen{position:relative;aspect-ratio:16/10;background:#000;border-radius:clamp(10px,1.4vw,20px);overflow:hidden}
+.screen .pic{position:absolute;inset:0}
+.screen canvas,.screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.osd{position:absolute;right:14px;top:12px;color:#F3E9DA;background:rgba(22,21,20,.72);padding:5px 12px 4px;border-radius:6px}
+.side{display:flex;flex-direction:column;align-items:center;gap:clamp(10px,1.4vw,18px);padding-top:6px}
+.knob{width:76%;aspect-ratio:1;border-radius:50%;background:#55524E;position:relative;transition:transform .5s var(--spring),background .2s}
+.knob::after{content:"";position:absolute;left:44%;right:44%;top:8%;height:30%;border-radius:99px;background:var(--ground)}
+.set.live .knob{background:var(--terra)}
+.knob.s{width:46%;background:#474542}
+.spk{width:76%;flex:1;min-height:40px;background:repeating-linear-gradient(0deg,#474542 0 4px,transparent 4px 11px);border-radius:4px}
+.chans{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.chans button{display:grid;grid-template-columns:54px minmax(0,1fr) auto;align-items:center;gap:4px 14px;width:100%;text-align:left;padding:16px 16px 18px 14px;background:transparent;border:0;border-bottom:1px solid var(--line);cursor:pointer;position:relative;transition:background .22s,color .22s}
+.chans b{font-weight:400;color:var(--dim);transition:color .22s}
+.chans strong{font-size:21px;line-height:1.2}
+.chans small{grid-column:2;color:var(--dim);font-size:15px;transition:color .22s}
+.chans em{font-style:normal;grid-row:1/3;grid-column:3;font-size:14px;color:var(--dim);border:1px solid var(--line);padding:4px 12px;border-radius:99px;transition:color .22s,border-color .22s}
+.chans button:hover{background:var(--raise)}
+.chans .on button{background:var(--terra);color:var(--cream)}.chans .on b,.chans .on small,.chans .on em{color:var(--cream)}.chans .on em{border-color:rgba(243,233,218,.5)}
+.chans .bar{position:absolute;left:0;bottom:-1px;height:3px;width:100%;background:var(--cream);transform:scaleX(0);transform-origin:0 50%}
+.chans .on.auto .bar{animation:run 5.2s linear both}
+@keyframes run{to{transform:scaleX(1)}}
+@media(max-width:760px){.guide{grid-template-columns:minmax(0,1fr)}.chans button{grid-template-columns:42px minmax(0,1fr) auto;padding:13px 10px 14px 6px}.chans strong{font-size:19px}}
+</style>
+</head>
+<body>
+<div id="page"></div>
+<script src="../shared/data.js?v=1795750983"></script>
+<script src="../shared/kit.js?v=1795750983"></script>
+<script src="../shared/viewer.js?v=1795750983"></script>
+<script src="../shared/spec.js?v=1795750983"></script>
+<script>
+const W=Kit.WORK,CH=[['Brand spot',W.airport],['Product launch',W.jiffy_hook],['Social cutdowns',{k:'flow',p:0}],['Idents and bumpers',{k:'kit',p:0}],['Campaign toolkit',W.zebra_scheduling]];
+const S=Spec.build({key:'commercials',title:'COMMERCIALS',seed:5,
+  reel:[{k:'desert',p:0},{k:'wave',p:0},{k:'kit',p:0}],
+  sigTitle:'The channel guide',sigNote:'Pick a channel',
+  sig:`<div class="guide pad"><div class="set" id="set"><div class="screen"><div class="pic" id="pic"><canvas id="tv" role="img" aria-label="Drawn stand-in for the spot on this channel"></canvas><video id="tvv" muted loop playsinline hidden></video></div><span class="osd el" id="osd">CH 01</span></div>
+    <div class="side" aria-hidden="true"><i class="knob" id="knob"></i><i class="knob s"></i><i class="spk"></i></div></div>
+  <ol class="chans" id="chans">${CH.map((c,i)=>`<li><button type="button" data-i="${i}"><b class="el">0${i+1}</b><strong>${c[0]}</strong><em>[Length]</em><small>${c[1].clip?c[1].title+', '+c[1].credit:'[One line]'}</small><i class="bar"></i></button></li>`).join('')}</ol></div>`,
+  workNote:'Placeholder picks',work:[W.airport,W.zebra_scheduling,W.jiffy_hook,W.zebra_inventory,W.jiffy_starborn,W.zebra_timekeeping]});
+if(!S.simple){/* the signature section only runs with ?v=full */
+/* changing channel: the picture collapses to a line, the knob clicks round, the next spot snaps open */
+const tv=S.$('#pic'),tvv=S.$('#tvv'),art=new Kit.Art(S.$('#tv'),CH.map(c=>c[1].clip?{k:'kit',p:0}:c[1]),{hold:true}),rows=S.$$('#chans li'),knob=S.$('#knob'),osd=S.$('#osd'),set=S.$('#set');let cur=-1,auto=true,timer=0,busy=false;
+function tune(i,user){if(i===cur||busy)return;if(user){auto=false;clearTimeout(timer)}const first=cur<0;cur=i;rows.forEach((r,k)=>{r.classList.toggle('on',k===i);r.classList.toggle('auto',auto&&k===i)});knob.style.transform=`rotate(${i*52}deg)`;
+  const swap=()=>{const c=CH[i][1];if(c.clip){tvv.poster='../shared/media/clips/'+c.clip+'.jpg';tvv.src='../shared/media/clips/'+c.clip+'.mp4';tvv.hidden=false;if(!Kit.still)tvv.play().catch(()=>{})}else{tvv.pause();tvv.hidden=true;art.set(i)}osd.textContent='CH 0'+(i+1);busy=false;if(!Kit.still&&!first)tv.animate([{transform:'scaleY(.02)',filter:'brightness(4)'},{transform:'scaleY(1)',filter:'brightness(1)'}],{duration:340,easing:'cubic-bezier(.2,.8,.2,1)'})};
+  if(first||Kit.still)swap();else{busy=true;tv.animate([{transform:'scaleY(1)',filter:'brightness(1)'},{transform:'scaleY(.02)',filter:'brightness(4)'}],{duration:130,easing:'ease-in'}).onfinish=swap}
+  if(auto)timer=setTimeout(()=>tune((cur+1)%CH.length),5200)}
+rows.forEach((r,i)=>{const b=r.querySelector('button');b.addEventListener('click',()=>tune(i,true));b.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')tune(i,true)})});
+Kit.once(S.$('#sig'),()=>{set.classList.add('live');art.play();tune(0)},.3);
+}
+</script>
+<script src="../shared/nav.js?v=1795750983"></script>
+</body>
+</html>
