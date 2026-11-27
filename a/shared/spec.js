@@ -40,7 +40,7 @@ ${SIMPLE?`<section aria-labelledby="w-h"><div class="head pad"><h2 id="w-h" clas
 <section aria-labelledby="h-h"><div class="head pad"><h2 id="h-h" class="rv">How it goes</h2><span class="rv" style="--d:1">Shown with one real job, Hook to Wormhole for Jiffy Learning</span></div>
   <div class="c3 how">${['Concept','Storyboard and style frames','Animation and delivery'].map((s,i)=>`<div class="rv" style="--d:${i*2}"><figure class="pv pv${i}">${PV[i]}</figure><span class="n">0${i+1}</span><strong>${s}</strong><p>[One line]</p></div>`).join('')}</div></section>
 <section aria-labelledby="o-h"><div class="head pad"><h2 id="o-h" class="rv">Other specialties</h2></div>
-<nav class="other" aria-labelledby="o-h">${others.map((o,i)=>`<a class="rv" style="--d:${i}" href="../${o.k}/index.html${Q}"><i class="${o.i}"></i><span><strong>${o.n}</strong><small>[One line]</small></span><em class="pillgo"><span>${SEE[o.k]}</span>${ARR}</em></a>`).join('')}</nav></section>
+<nav class="other" aria-labelledby="o-h">${others.map((o,i)=>`<a class="rv" style="--d:${i}" href="../${o.k}/index.html${Q}"><span class="icw" data-ic="${o.k}" data-s="64"></span><span><strong>${o.n}</strong><small>[One line]</small></span><em class="pillgo"><span>${SEE[o.k]}</span>${ARR}</em></a>`).join('')}</nav></section>
 <section class="cta pad"><h2 id="cta-h">Have one of these in mind?</h2><a class="btn rv" href="../main/index.html${Q}#start">Start a project <svg width="20" height="12" viewBox="0 0 20 12" aria-hidden="true"><path d="M1 6h17M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a></section>
 </main>
 <footer class="pad"><span>Amigo Productions, Oceanside CA</span></footer>`;
@@ -62,6 +62,8 @@ ${SIMPLE?`<section aria-labelledby="w-h"><div class="head pad"><h2 id="w-h" clas
   if(SIMPLE){$$('#show .tile').forEach((el,i)=>{const w=show[i],a=Kit.media(el.querySelector('canvas'),w,{offset:1.2+i*.9});
       if(Kit.touchy)a.play();else{el.addEventListener('pointerenter',()=>a.play());el.addEventListener('pointerleave',()=>a.pause());el.addEventListener('focus',()=>a.play());el.addEventListener('blur',()=>a.pause())}
       el.addEventListener('click',()=>Viewer.open(show,i,el))})}
+  /* other specialties: option B's line icons (shared/icons.js) draw on one after another, then loop */
+  if(window.AmIcons){AmIcons.mount($('.other'));$$('.other a').forEach((a,i)=>Kit.once(a,e=>setTimeout(()=>e.classList.add('in'),i*140),.4))}
   Kit.words($('#cta-h'));Kit.fixG();Kit.once($('#cta-h'),e=>e.classList.add('in'),.5);
   Kit.reveals();
   return{$,$$,simple:SIMPLE};

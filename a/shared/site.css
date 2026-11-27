@@ -273,3 +273,28 @@ footer{justify-content:flex-start}
 .nh a,.nh-menu a{text-decoration:none}
 
 p{text-wrap:pretty}
+
+/* specialty icons (11-27, from option B): line icons that draw on, then loop while on screen */
+.ic{display:block;overflow:visible}
+.ic .s{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ic .s.dim{opacity:.42}
+.ic .f{fill:currentColor;stroke:none}
+.ic .lt{fill:var(--terra)}
+.ic .ln{stroke-dasharray:1 1.6;stroke-dashoffset:1.1;transition:stroke-dashoffset 1.1s cubic-bezier(.65,0,.35,1) var(--d,0s)}
+.in .ic .ln{stroke-dashoffset:0}
+.ic .pop{transform:scale(0);transform-box:fill-box;transform-origin:center;transition:transform .55s cubic-bezier(.34,1.56,.64,1) .7s}
+.in .ic .pop{transform:scale(1)}
+.ic .knob,.ic .k1,.ic .k2,.ic .k3,.ic .b1,.ic .b2,.ic .b3,.ic .b4{transform-box:fill-box;transform-origin:center;transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+.in .ic .knob{animation:ic-knob 3.4s cubic-bezier(.65,0,.35,1) infinite}
+.in .ic .lt{animation:ic-scan 4.2s cubic-bezier(.65,0,.35,1) infinite;transform-box:fill-box}
+.in .ic .k1{animation:ic-k1 3.2s cubic-bezier(.65,0,.35,1) infinite}.in .ic .k2{animation:ic-k2 3.2s cubic-bezier(.65,0,.35,1) infinite}.in .ic .k3{animation:ic-k3 3.2s cubic-bezier(.65,0,.35,1) .2s infinite}
+a:hover .ic .b1{transform:translate(-4px,-4px)}a:hover .ic .b2{transform:translate(4px,-4px)}a:hover .ic .b3{transform:translate(-4px,4px)}a:hover .ic .b4{transform:translate(4px,4px)}
+a:hover .ic .lt{fill:var(--cream)}
+@keyframes ic-knob{0%,38%{transform:none}50%,88%{transform:translateX(var(--kx))}100%{transform:none}}
+@keyframes ic-scan{0%,100%{transform:translate(-11px,6px)}50%{transform:translate(5px,-5px)}}
+@keyframes ic-k1{0%,100%{transform:none}50%{transform:translateX(7px) rotate(90deg)}}
+@keyframes ic-k2{0%,30%{transform:none}60%,100%{transform:rotate(180deg)}}
+@keyframes ic-k3{0%,100%{transform:none}50%{transform:translateX(-7px) rotate(90deg)}}
+@media(prefers-reduced-motion:reduce){.ic .ln{stroke-dashoffset:0;transition:none}.ic .pop{transform:scale(1);transition:none}.in .ic *{animation:none!important}}
+.door .icw{display:block;margin-bottom:auto;color:inherit}
+.other a .icw{flex:none;display:block}

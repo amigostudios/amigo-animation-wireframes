@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>UI and explainers · Amigo Animation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="../shared/site.css?v=1795818087">
+<link rel="stylesheet" href="../shared/site.css?v=1795818542">
 <style>
 /* signature: a drawn desktop. Dock icons open windows, each window plays one kind of UI film. Windows drag. */
 .desk{position:relative;aspect-ratio:16/8.4;max-height:820px;width:100%;overflow:hidden;background:var(--raise);touch-action:pan-y;user-select:none;-webkit-user-select:none}
@@ -76,10 +76,11 @@
 </head>
 <body>
 <div id="page"></div>
-<script src="../shared/data.js?v=1795818087"></script>
-<script src="../shared/kit.js?v=1795818087"></script>
-<script src="../shared/viewer.js?v=1795818087"></script>
-<script src="../shared/spec.js?v=1795818087"></script>
+<script src="../shared/data.js?v=1795818542"></script>
+<script src="../shared/kit.js?v=1795818542"></script>
+<script src="../shared/viewer.js?v=1795818542"></script>
+<script src="../shared/icons.js?v=1795818542"></script>
+<script src="../shared/spec.js?v=1795818542"></script>
 <script>
 const W=Kit.WORK,APPS=[['Workcloud Scheduling',W.zebra_scheduling],['Workcloud Inventory Visibility',W.zebra_inventory],['Hook to Wormhole',W.jiffy_hook],['Workcloud Timekeeping',W.zebra_timekeeping]];
 /* ?sig=desk brings back the first idea (a drawn desktop with windows you drag). Austin, 11-25: nice idea,
@@ -139,6 +140,6 @@ Kit.once(S.$('#np'),()=>{seen=true;if(!paused)arts[cur].play()},.3);
 }
 }
 </script>
-<script src="../shared/nav.js?v=1795818087"></script>
+<script src="../shared/nav.js?v=1795818542"></script>
 </body>
 </html>
