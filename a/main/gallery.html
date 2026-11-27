@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta property="og:title" content="Amigo Animation">
+<meta property="og:image" content="https://amigostudios.github.io/amigo-animation-wireframes/a/shared/media/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="noindex">
+<title>Amigo Animation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../shared/site.css?v=1795817556">
+<script>/* prototype variant: main/index.html?hero=none drops the studio photo and the torn edge */(function(){var h=new URLSearchParams(location.search).get("hero"),c=document.documentElement.classList;/* none = A, wordmark spelled in tiles; b = B, wordmark as a window onto the kit */if(h==="none")c.add("nophoto","tilesword");if(h==="b")c.add("nophoto","wordwin");/* c = C, the reel itself is the hero */if(h==="c")c.add("reelhero");/* d = D, the header is a timeline you scrub */if(h==="d")c.add("nophoto","timeline");/* Gallery version (11-27): no reel, the work grid is the hero. main/gallery.html or ?view=gallery */if(/gallery\.html$/.test(location.pathname)||new URLSearchParams(location.search).get("view")==="gallery")c.add("gal")})()</script>
+<style>
+/* hero: studio photo that peels away on scroll */
+.hero{position:relative;background:#2A2420;isolation:isolate;overflow:hidden}
+.hero .bg{position:absolute;inset:-2% 0 -14% 0;background:url(../shared/media/site_a.jpg) center 55%/cover no-repeat;z-index:-2;will-change:transform}
+.hero::before{content:"";position:absolute;inset:0;background:rgba(36,28,22,.36);z-index:-1}
+.lead{padding-top:clamp(70px,14vw,190px);padding-bottom:clamp(96px,12vw,176px);position:relative;z-index:4}
+.lead h1{font-size:clamp(50px,13.2vw,210px);color:var(--cream);overflow:hidden;padding-bottom:.05em;margin-bottom:-.05em;white-space:nowrap}
+.lead h1 span{display:inline-block;transform:translateY(108%);transition:transform .8s var(--out);transition-delay:calc(var(--i) * 50ms + .25s)}
+.lead p{font:400 clamp(21px,2.3vw,32px)/1.2 ElCamino,"Trebuchet MS",sans-serif;letter-spacing:.05em;text-transform:uppercase;margin:16px 0 0 4px;color:var(--cream);clip-path:inset(0 100% 0 0);transition:clip-path .7s steps(14) .95s}
+.hero nav.main a{opacity:0;transition:opacity .5s calc(1.25s + var(--i) * 70ms)}
+.go .lead h1 span{transform:none}.go .lead p{clip-path:inset(0 0 0 0)}.go nav.main a{opacity:1}
+.go .logo svg{animation:hello 1.1s var(--out) .1s both}
+@keyframes hello{0%{transform:rotate(0) scale(.6);opacity:0}30%{transform:rotate(-11deg) scale(1);opacity:1}55%{transform:rotate(8deg)}78%{transform:rotate(-4deg)}100%{transform:none}}
+/* no-photo variant: the wordmark sits on the page grey and the tile field comes straight after it */
+.nophoto .hero{background:var(--ground)}
+.nophoto .hero .bg,.nophoto .hero::before,.nophoto .hero .tear,.nophoto .hero .grainy{display:none}
+.nophoto .lead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);padding:0}
+.top .tag{display:none;color:var(--dim);margin-right:auto;margin-left:6px}
+.nophoto .top .tag{display:block;opacity:0;transition:opacity .6s 1s}.nophoto .go .top .tag,.go.nophoto .top .tag,.nophoto body.go .top .tag{opacity:1}
+/* exploration C: the reel plays where the photo was; the wordmark, torn edge and grain stay */
+.reelhero .hero .bg,.reelhero .hero::before{display:none}
+.reelhero .hero{cursor:pointer;background:#000}
+.reelhero .hero #reel{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.reelhero .hero #reel::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(22,18,15,.62) 0,rgba(22,18,15,.28) 34%,rgba(22,18,15,.5) 100%);pointer-events:none}
+.reelhero .hero #reel .pill{left:auto;right:var(--gutr);bottom:calc(clamp(34px,5vw,70px) + 22px);z-index:1}
+.reelhero .lead{pointer-events:none}
+/* exploration D: the wordmark on a timeline */
+#tl{display:none}
+.timeline #tl{display:block;width:100%;margin:0 0 clamp(18px,2.2vw,34px);touch-action:pan-y;cursor:ew-resize}
+/* exploration B: the wordmark is a window onto the moving kit */
+#wm{display:none}
+.wordwin #wm{display:block;width:100%;margin:clamp(4px,1vw,14px) 0 clamp(22px,2.6vw,40px);touch-action:pan-y}
+/* clients */
+.clients{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border-top:1px solid var(--line)}
+.clients div{display:flex;align-items:center;justify-content:center;text-align:center;min-height:128px;padding:8px;font-weight:500;font-size:15px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);transition:background .18s,color .18s;min-width:0}
+.clients div:hover{background:var(--terra);color:var(--cream)}
+.clients svg{display:block;width:calc(var(--lw) * var(--lu,52px));height:auto;opacity:.86;transition:opacity .18s,transform .45s var(--spring)}
+.clients div:hover svg{opacity:1;transform:scale(1.06)}
+.clients.pass div{animation:pass .62s ease-in-out calc(var(--k) * 120ms) both}
+@keyframes pass{0%,100%{background:transparent;color:var(--ink)}40%{background:var(--terra);color:var(--cream)}}
+/* doors */
+.doors{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.door{display:flex;flex-direction:column;gap:10px;padding:28px;min-height:350px;text-decoration:none;border-right:1px solid var(--line);transition:background .22s,color .22s;min-width:0;position:relative}
+.door:last-child{border-right:0}
+.door i{display:block;width:120px;height:120px;background:#8D8983;margin-bottom:auto;transition:border-radius .55s var(--spring),transform .55s var(--spring),background .22s,height .55s var(--spring),margin .55s var(--spring)}
+.door strong{font-size:25px;line-height:1.15}.door small{font-size:16px;color:var(--dim);transition:color .22s}
+.door em{font-style:normal;font-weight:500;display:flex;align-items:center;gap:8px;margin-top:6px}
+.door em svg{transition:transform .4s var(--spring)}.door:hover em svg{transform:translateX(6px)}
+.door:hover{background:var(--terra);color:var(--cream)}.door:hover small{color:var(--cream)}.door:hover i{background:var(--cream)}
+.d1 i{border-radius:60px 60px 0 0}.d1:hover i,.d1.tick i{border-radius:60px;transform:scale(.86)}
+.d2 i{border-radius:60px;height:60px;margin-top:30px}.d2:hover i,.d2.tick i{border-radius:0 0 100% 0;height:120px;margin-top:0}
+.d3 i{border-radius:50%}.d3:hover i,.d3.tick i{border-radius:0 60px 60px 60px;transform:rotate(90deg)}
+.d4 i{border-radius:0 100% 0 0}.d4:hover i,.d4.tick i{border-radius:60px 60px 0 0;transform:scale(.92)}
+.door.tick i{background:var(--cream)}
+/* team: a head and shoulders from two kit shapes */
+.team{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px}
+.who{min-width:0}.who i{display:block;aspect-ratio:4/5;background:var(--raise);position:relative;overflow:hidden}
+.who i::before{content:"";position:absolute;left:31%;right:31%;top:20%;aspect-ratio:1;border-radius:50%;background:#55524E;transition:background .2s,transform .55s var(--spring)}
+.who i::after{content:"";position:absolute;left:14%;right:14%;top:58%;bottom:0;border-radius:999px 999px 0 0;background:#474542;transition:background .2s,transform .55s var(--spring);transform-origin:50% 100%}
+.who:hover i::before{background:var(--cream);transform:translateY(-6%) scale(1.08)}.who:hover i::after{background:var(--terra);transform:scaleY(1.06)}
+.who i.ph::before,.who i.ph::after{display:none}
+.who img{display:block;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.06) brightness(.92);transition:filter .35s,transform .7s var(--out)}
+.who:hover img{filter:none;transform:scale(1.04)}
+.who strong{display:block;margin-top:12px}.who span{color:var(--dim)}
+/* contact: the wave breaks over the tear into the ocean */
+.close{position:relative;margin-top:clamp(70px,8vw,120px);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:#10181A url(../shared/media/ocean.jpg) center 70%/cover no-repeat;isolation:isolate}
+.close::before{content:"";position:absolute;inset:0;background:rgba(16,24,26,.3);z-index:-1}
+/* wave parked 11-23 at Austin's request: remove display:none (and restore the taller margin-top on .close) to bring it back */
+#bigwave{display:none;position:absolute;left:14%;bottom:calc(100% - clamp(34px,5vw,70px));width:clamp(300px,36vw,540px);aspect-ratio:3/2;z-index:3;pointer-events:none}
+.close h2{font-size:clamp(50px,8vw,124px);color:var(--cream);padding-top:clamp(90px,10vw,150px);padding-bottom:60px;position:relative;z-index:4}
+form{background:var(--ground);display:flex;flex-direction:column;gap:18px;padding-top:clamp(90px,9vw,130px);padding-bottom:64px;min-width:0;position:relative;z-index:1}
+label{font-weight:500}.f input[type=text],.f input[type=email]{display:block;margin-top:6px;width:100%;min-height:50px;padding:0 14px;background:transparent;color:var(--ink);border:1px solid #8D8983;border-radius:4px;font:inherit;transition:border-color .2s}
+.f input[type=text]:hover,.f input[type=email]:hover{border-color:var(--cream)}
+fieldset{border:0;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}legend{font-weight:500;padding:0;margin-bottom:6px}
+.check{display:flex;align-items:center;gap:12px;min-height:44px;font-weight:400;cursor:pointer}
+.check input{appearance:none;-webkit-appearance:none;width:22px;height:22px;margin:0;background:#4A4845;border-radius:0;transition:border-radius .45s var(--spring),background .2s,transform .45s var(--spring);flex:none;cursor:pointer}
+.check input:checked{background:var(--terra);transform:scale(1.12)}
+#n1:checked{border-radius:11px 11px 0 0}#n2:checked{border-radius:11px;transform:scale(1.2,.62)}#n3:checked{border-radius:50%}#n4:checked{border-radius:0 100% 0 0}
+form .btn{align-self:flex-start}
+.fin,.thanks{transition:opacity .4s,transform .5s var(--out)}
+.thanks{position:absolute;inset:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:14px;padding:0 var(--gutr) 0 var(--gut);opacity:0;pointer-events:none;transform:translateY(16px)}
+.thanks strong{font:400 clamp(34px,4vw,56px)/1 Oaxaca,Impact,sans-serif;letter-spacing:.015em}.thanks p{color:var(--dim)}
+.sent .fin{opacity:0;pointer-events:none;transform:translateY(-12px)}.sent .thanks{opacity:1;transform:none;pointer-events:auto}
+.sent .thanks svg{transform-origin:50% 90%;animation:hello 1.1s var(--out) .15s both}
+.fin{display:flex;flex-direction:column;gap:18px}
+@media(max-width:760px){
+.clients{grid-template-columns:repeat(3,minmax(0,1fr))}.clients div{min-height:84px;--lu:30px}
+.doors{grid-template-columns:minmax(0,1fr)}.door{flex-direction:row;flex-wrap:wrap;align-items:center;min-height:120px;border-right:0;border-bottom:1px solid var(--line);padding:16px var(--gutr) 16px var(--gut);gap:6px 16px}.door i{width:64px;height:64px;margin:0}.door:last-child{border-bottom:0}
+.d1 i{border-radius:32px 32px 0 0}.d1:hover i,.d1.tick i{border-radius:32px}.d2 i{height:32px;margin-top:0;border-radius:32px}.d2:hover i,.d2.tick i{height:64px}.d3:hover i,.d3.tick i{border-radius:0 32px 32px 32px}.d4:hover i,.d4.tick i{border-radius:32px 32px 0 0}
+.door strong{flex:1 1 50%}.door small{flex:1 1 100%;order:3}.door em{order:4;flex:1 1 100%;margin-top:0}
+.team{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:22px}
+.close{grid-template-columns:minmax(0,1fr);margin-top:60px}.close h2{padding-bottom:50px;padding-top:70px}form{padding-top:40px}
+#bigwave{left:2%;width:310px}
+}
+@media(prefers-reduced-motion:reduce){.lead h1 span,.lead p,.hero nav.main a{transition-duration:.3s;transition-delay:0s}.go .logo svg,.sent .thanks svg,.clients.pass div{animation:none}}
+
+/* statement (11-25, Austin: the section felt busy): one big line, the sentence and button stacked under it,
+   more air around it; the client heading is a small label so only one headline speaks here */
+.say.calm{grid-template-columns:minmax(0,1fr);gap:26px;padding-top:clamp(84px,10vw,160px);padding-bottom:clamp(84px,10vw,150px)}
+.say.calm h2{max-width:17em}
+.say.calm p{margin:0 0 26px;max-width:46ch;font-size:clamp(17px,1.35vw,21px)}
+.head h2.lbl{font:500 14px/1.4 "DM Sans",system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+/* selected work reveal (11-25, Austin: the reveals could be more interesting): each piece sits behind a wall of
+   kit tiles. A wave of light greys runs through the tiles (black, white and grey only), then each one slides out of its square
+   (the Slide swap move from the tile field) and the work is underneath, settling from a slight zoom. */
+#pieces .piece{background:var(--deep)}
+#pieces .piece .sh{clip-path:none}
+#pieces .piece .sh canvas,#pieces .piece .sh video{scale:1.14;transition:scale 1.5s var(--out) .15s,transform .7s var(--out)}
+#pieces .piece.open .sh canvas,#pieces .piece.open .sh video{scale:1}
+.wall{position:absolute;inset:0;display:grid;grid-template-columns:repeat(var(--c),minmax(0,1fr));grid-auto-rows:var(--t);align-content:start;overflow:hidden;pointer-events:none;z-index:1}
+.wall>span{position:relative;overflow:hidden;min-width:0;min-height:0}
+.wall b{position:absolute;inset:0;display:grid;place-items:center;background:var(--ground);box-shadow:inset 0 0 0 1px var(--deep)}
+.wall b::after{content:"";width:62%;height:62%;background:var(--raise)}
+.wall .k0::after{border-radius:50%}.wall .k1::after{border-radius:999px 999px 0 0}.wall .k2::after{border-radius:0 100% 0 0;width:100%;height:100%;place-self:end start}
+.wall .k3::after{height:30%;border-radius:999px}.wall .k4::after{border-radius:100% 0 0 0;width:100%;height:100%;place-self:end end}.wall .k5::after{width:100%;height:100%;border-radius:0}
+@keyframes tile-out{0%{transform:none;background:var(--ground)}22%,46%{transform:none;background:var(--pc)}100%{transform:translate(var(--tx),var(--ty));background:var(--pc)}}
+@keyframes tile-ink{0%{background:var(--raise)}22%,100%{background:var(--pi)}}
+.piece.open .wall b{animation:tile-out .95s cubic-bezier(.6,0,.2,1) calc(var(--n) * 55ms) both}
+.piece.open .wall b::after{animation:tile-ink .95s linear calc(var(--n) * 55ms) both}
+#pieces .piece .lab{transition:background .2s,color .2s,transform .6s var(--out) .9s}
+@media(prefers-reduced-motion:reduce){.wall{display:none}#pieces .piece .sh canvas,#pieces .piece .sh video{scale:1;transition:none}}
+
+/* 11-26 content sync with option B: the pitch sits in the header so the first screen reads as a whole */
+.lead{padding-top:clamp(36px,5.4vw,84px);padding-bottom:clamp(84px,8vw,128px)}
+.lead h1{font-size:clamp(50px,12.2vw,196px)}
+.lead .pitch{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:20px clamp(28px,4vw,72px);align-items:end;margin-top:clamp(30px,4vw,60px);padding-top:clamp(22px,2.4vw,34px);border-top:1px solid rgba(243,233,218,.28);color:var(--cream)}
+.lead .pitch h2{font-size:clamp(30px,3.5vw,54px);line-height:1.04;max-width:15em}
+.lead .pitch p{font:400 clamp(16px,1.3vw,19px)/1.5 "DM Sans",system-ui,sans-serif;letter-spacing:0;text-transform:none;margin:0 0 20px;clip-path:none;color:rgba(243,233,218,.82);max-width:42ch}
+.lead .pitch>div{opacity:0;transform:translateY(14px);transition:opacity .6s 1.3s,transform .7s var(--out) 1.3s}
+.go .lead .pitch>div{opacity:1;transform:none}
+.btn svg{margin-left:10px;transition:transform .35s var(--spring)}.btn:hover svg{transform:translateX(4px)}
+nav.main a.go{padding:0 18px;border-radius:99px;background:var(--cream);color:var(--night);margin-left:4px}
+nav.main a.go::after{display:none}nav.main a.go:hover{background:var(--terra);color:var(--cream)}
+/* selected work: every piece opens the viewer */
+#pieces .piece{cursor:pointer}
+.piece .pl{position:absolute;right:16px;bottom:14px;width:50px;height:50px;border-radius:50%;background:var(--cream);color:var(--night);display:grid;place-items:center;z-index:2;opacity:0;transform:scale(.6);transition:opacity .25s,transform .45s var(--spring),background .2s,color .2s}
+.piece .pl svg{margin-left:3px}
+.piece.open:hover .pl,.piece.open:focus-visible .pl{opacity:1;transform:none}.piece:hover .pl{background:var(--terra);color:var(--cream)}
+/* what we make: each tile ends in a real button, a pill with a round arrow */
+.door em.pillgo{align-self:flex-start;display:inline-flex;align-items:center;gap:12px;margin-top:14px;padding:6px 6px 6px 18px;border:1px solid rgba(241,239,235,.34);border-radius:99px;font-weight:500;font-size:15px;transition:background .22s,color .22s,border-color .22s}
+.door em.pillgo .ar{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--cream);color:var(--night);transition:transform .4s var(--spring),background .22s,color .22s}
+.door em.pillgo svg{transition:none}.door:hover em svg{transform:none}
+.door:hover em.pillgo{background:var(--cream);color:var(--night);border-color:var(--cream)}.door:hover em.pillgo .ar{background:var(--night);color:var(--cream);transform:translateX(4px)}
+/* team: Austin framed on his face */
+.who i.ph{display:block}
+.who img.face{object-fit:fill}
+/* who we are */
+.story{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:28px clamp(28px,4vw,72px);border-top:1px solid var(--line);padding-top:clamp(28px,3vw,44px);align-items:start}
+.story .big{font-size:clamp(24px,2.3vw,34px);line-height:1.28;max-width:24em;text-wrap:pretty}
+.story .cols{display:grid;gap:18px;color:var(--dim)}.story .cols p{text-wrap:pretty}
+footer{justify-content:flex-start}
+@media(max-width:760px){
+.lead{padding-top:30px;padding-bottom:72px}
+.lead .pitch{grid-template-columns:minmax(0,1fr);gap:14px;margin-top:26px;padding-top:20px}
+.lead .pitch h2{font-size:clamp(28px,8vw,36px)}
+.lead .pitch p{margin-bottom:18px}
+.top{min-height:72px}nav.main{display:none}
+.door em.pillgo{margin-top:4px;flex:0 0 auto!important}
+.piece .pl{opacity:1;transform:none;width:40px;height:40px;right:10px;bottom:10px}
+.story{grid-template-columns:minmax(0,1fr)}
+}
+
+/* 11-26 B mobile pass, mirrored: logo marquee on phones, work as a vertical grid (first full, 2-up, last full), Austin pre-cropped */
+.clients .dup{display:none}
+@media(max-width:760px){
+.cwrap{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.cwrap .clients{border-top:0}
+#pieces .piece{grid-column:span 6;aspect-ratio:1/1}
+#pieces .piece:first-child,#pieces .piece:last-child{grid-column:span 12;aspect-ratio:16/10}
+#pieces .piece:not(:first-child):not(:last-child) .lab{font-size:12.5px;line-height:1.3;padding:7px 10px;max-width:calc(100% - 44px)}
+#pieces .piece:not(:first-child):not(:last-child) .pl{width:32px;height:32px;right:8px;bottom:8px}#pieces .piece:not(:first-child):not(:last-child) .pl svg{width:14px}
+}
+@media(max-width:760px) and (prefers-reduced-motion:no-preference){
+.cwrap .clients{display:flex;width:max-content;animation:mq 46s linear infinite}
+.cwrap .clients .dup{display:flex}
+.cwrap .clients div{width:118px;min-height:84px;border-bottom:0;flex:none}
+@keyframes mq{to{transform:translateX(-50%)}}
+}
+
+/* ---------- Gallery version (11-27, Austin: build the tile design's gallery too, to compare with the reel version) ----------
+   Same idea as option B's gallery: no reel. Header (word, place line, pitch), a single row of tiles, then the work
+   grid as the hero: 3 across, first piece 2x2, every piece plays once it has opened, labels over the picture. */
+.gonly{display:none}
+.gal .gonly{display:block}
+.gal #reel{display:none}
+.gal #work .head{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);padding:0}
+.gal #work{border-top:2px solid var(--ground)}
+@media(min-width:761px){
+.gal #pieces{grid-template-columns:repeat(3,minmax(0,1fr))}
+.gal #pieces .piece{grid-column:auto;aspect-ratio:16/10}
+.gal #pieces .piece:first-child{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
+}
+@media(max-width:760px){
+.gal #pieces .piece:last-child{grid-column:span 6;aspect-ratio:1/1}
+.gal #pieces .piece:last-child .lab{font-size:12.5px;line-height:1.3;padding:7px 10px;max-width:calc(100% - 44px)}
+.gal #pieces .piece:last-child .pl{width:32px;height:32px;right:8px;bottom:8px}.gal #pieces .piece:last-child .pl svg{width:14px}
+}
+/* review switch between the two versions */
+.vsw{position:fixed;left:14px;bottom:14px;z-index:45;display:flex;align-items:center;gap:4px;padding:5px;border-radius:999px;background:rgba(22,21,20,.92);box-shadow:0 6px 24px rgba(0,0,0,.4);font-size:13px;font-weight:500}
+.vsw span{padding:0 8px 0 10px;color:var(--dim)}
+.vsw a{padding:7px 13px;border-radius:999px;text-decoration:none;color:var(--ink);transition:background .2s,color .2s}
+.vsw a:hover{background:#34322F}
+.vsw a.on{background:var(--cream);color:var(--night)}
+</style>
+</head>
+<body>
+<header class="hero" id="top">
+  <div class="bg" aria-hidden="true"></div>
+  <div class="top pad">
+    <a class="logo" href="#top" aria-label="Amigo home" data-logo="58"></a><span class="tag el">Design + motion, Oceanside CA</span>
+    <nav class="main" aria-label="Main"><a href="#work" style="--i:0">Work</a><a href="#doors" style="--i:1">What we make</a><a href="#about" style="--i:2">Team</a><a href="#start" class="go" style="--i:3">Start a project</a></nav>
+  </div>
+  <canvas id="wm" aria-hidden="true"></canvas><canvas id="tl" role="img" aria-label="The word Animation, with each letter bouncing into place on an animation timeline"></canvas>
+  <div class="lead pad"><h1 id="word" aria-label="Animation">ANIMATION</h1><p>Design + Motion, San Diego</p>
+    <div class="pitch" id="say"><h2 id="line">[One line: what you make and who it is for]</h2><div><p>[Two sentences of positioning, once the name and focus are decided.]</p><a class="btn" href="#start">Start a project <svg width="20" height="12" viewBox="0 0 20 12" aria-hidden="true"><path d="M1 6h17M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a></div></div></div>
+  <svg class="tear b" data-tear="4" aria-hidden="true"></svg>
+  <div class="grainy" aria-hidden="true"></div>
+</header>
+<main>
+<section class="field" id="field" aria-label="Reel"><canvas class="kit" id="kit" aria-hidden="true"></canvas><div class="grainy" aria-hidden="true"></div>
+  <div class="reel" id="reel" role="button" tabindex="0" aria-label="Watch the reel">
+    <canvas aria-hidden="true"></canvas>
+    <span class="pill"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg>Watch the reel</span>
+    <button class="x" type="button" aria-label="Close the reel"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3l12 12M15 3L3 15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"></path></svg></button>
+  </div>
+</section>
+<section aria-labelledby="c-h"><div class="head pad" style="padding-top:clamp(44px,5vw,72px);padding-bottom:18px"><h2 id="c-h" class="rv lbl">Who we have worked with</h2></div>
+  <div class="cwrap"><div class="clients" id="clients"><div data-k="jeep"></div><div data-k="harley"></div><div data-k="zebra"></div><div data-k="adobe"></div><div data-k="hp"></div><div data-k="general"></div><div data-k="reef"></div><div data-k="skatelite"></div><div data-k="sdairport"></div><div data-k="google"></div><div data-k="toyota"></div><div data-k="yeti"></div><div data-k="apple"></div><div data-k="cocacola"></div><div data-k="patagonia"></div><div data-k="rivian"></div><div data-k="sonos"></div><div data-k="microsoft"></div></div></div></section>
+<section id="work" aria-labelledby="w-h"><div class="head pad"><h2 id="w-h" class="rv">Selected work</h2><a href="#work" class="rv" style="--d:1">All work</a></div>
+  <div class="work" id="pieces">
+    <a class="piece p7" href="#work" role="button" aria-label="Watch Holiday Spot, San Diego Airport" data-shape="disc" data-clip="airport" data-title="Holiday Spot" data-credit="San Diego Airport" style="--pc:#BA6441"><span class="sh"><canvas></canvas></span><span class="lab">Holiday Spot · San Diego Airport</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
+    <a class="piece p5" href="#work" role="button" aria-label="Watch Workcloud Inventory Visibility, Zebra" data-shape="arch" data-clip="zebra_inventory" data-title="Workcloud Inventory Visibility" data-credit="Zebra" style="--pc:#F3E9DA"><span class="sh"><canvas></canvas></span><span class="lab">Workcloud Inventory Visibility · Zebra</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
+    <a class="piece p5" href="#work" role="button" aria-label="Watch Hook to Wormhole, Jiffy Learning" data-shape="q1" data-clip="jiffy_hook" data-title="Hook to Wormhole" data-credit="Jiffy Learning" style="--pc:#BB6C2A"><span class="sh"><canvas></canvas></span><span class="lab">Hook to Wormhole · Jiffy Learning</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
+    <a class="piece p7" href="#work" role="button" aria-label="Watch Workcloud Timekeeping, Zebra" data-shape="cap" data-clip="zebra_timekeeping" data-title="Workcloud Timekeeping" data-credit="Zebra" style="--pc:#F3E9DA"><span class="sh"><canvas></canvas></span><span class="lab">Workcloud Timekeeping · Zebra</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
+    <a class="piece p7" href="#work" role="button" aria-label="Watch Star Born, Jiffy Learning" data-shape="q3" data-clip="jiffy_starborn" data-title="Star Born" data-credit="Jiffy Learning" style="--pc:#8E4427"><span class="sh"><canvas></canvas></span><span class="lab">Star Born · Jiffy Learning</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
+    <a class="piece p5" href="#work" role="button" aria-label="Watch Workcloud Scheduling, Zebra" data-shape="h1" data-clip="zebra_scheduling" data-title="Workcloud Scheduling" data-credit="Zebra" style="--pc:#F3E9DA"><span class="sh"><canvas></canvas></span><span class="lab">Workcloud Scheduling · Zebra</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
+    <a class="piece p5 gonly" href="#work" role="button" aria-label="Watch this piece" data-shape="disc" data-k="desert" style="--pc:#BA6441"><span class="sh"><canvas></canvas></span><span class="lab">[Piece] · [Credit]</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
+    <a class="piece p5 gonly" href="#work" role="button" aria-label="Watch this piece" data-shape="disc" data-k="wave" style="--pc:#F3E9DA"><span class="sh"><canvas></canvas></span><span class="lab">[Piece] · [Credit]</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
+    <a class="piece p5 gonly" href="#work" role="button" aria-label="Watch this piece" data-shape="disc" data-k="orb" style="--pc:#BB6C2A"><span class="sh"><canvas></canvas></span><span class="lab">[Piece] · [Credit]</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
+  </div></section>
+<section id="doors" aria-labelledby="d-h"><div class="head pad"><h2 id="d-h" class="rv">What we make</h2></div>
+  <div class="doors" id="doorrow">
+    <a class="door d1" href="../commercials/index.html"><i></i><strong>Commercials</strong><small>[One line]</small><em class="pillgo"><span>See commercials</span><b class="ar" aria-hidden="true"><svg width="16" height="12" viewBox="0 0 18 12"><path d="M1 6h15M11 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></b></em></a>
+    <a class="door d2" href="../ui/index.html"><i></i><strong>UI and explainers</strong><small>[One line]</small><em class="pillgo"><span>See UI work</span><b class="ar" aria-hidden="true"><svg width="16" height="12" viewBox="0 0 18 12"><path d="M1 6h15M11 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></b></em></a>
+    <a class="door d3" href="../3d/index.html"><i></i><strong>3D</strong><small>[One line]</small><em class="pillgo"><span>See 3D work</span><b class="ar" aria-hidden="true"><svg width="16" height="12" viewBox="0 0 18 12"><path d="M1 6h15M11 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></b></em></a>
+    <a class="door d4" href="../packages/index.html"><i></i><strong>Packages</strong><small>[One line]</small><em class="pillgo"><span>See packages</span><b class="ar" aria-hidden="true"><svg width="16" height="12" viewBox="0 0 18 12"><path d="M1 6h15M11 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></b></em></a>
+  </div></section>
+<section id="about" aria-labelledby="a-h"><div class="head pad"><h2 id="a-h" class="rv">Our team</h2><span class="rv" style="--d:1">[Short note on the team and Oceanside]</span></div>
+  <div class="team pad"><div class="who rv"><i class="ph"><img src="../shared/media/team/austin_45.jpg" alt="Austin Faure"></i><strong>Austin Faure</strong><span>[Role]</span></div><div class="who rv" style="--d:1"><i class="ph"><img src="../shared/media/team/james.jpg" alt="James Prola"></i><strong>James Prola</strong><span>[Role]</span></div><div class="who rv" style="--d:2"><i></i><strong>Brandon Means</strong><span>[Role]</span></div><div class="who rv" style="--d:3"><i></i><strong>Ashley Munson</strong><span>[Role]</span></div></div></section>
+<section id="who" aria-labelledby="y-h"><div class="head pad"><h2 id="y-h" class="rv">Who we are</h2></div>
+  <div class="story pad"><p class="big rv">[A short paragraph about who we are, how we work, and why clients come back. Two or three sentences.]</p><div class="cols"><p class="rv" style="--d:1">[Where we came from, and the kind of work we love most.]</p><p class="rv" style="--d:2">[How a project runs with us, who you talk to, and what working out of San Diego means.]</p></div></div></section>
+<section class="close" id="start" aria-labelledby="s-h"><canvas id="bigwave" aria-hidden="true"></canvas><svg class="tear t" data-tear="9" aria-hidden="true"></svg>
+  <div class="grainy" aria-hidden="true"></div>
+  <div class="pad"><h2 id="s-h" class="rv">START A PROJECT</h2></div>
+  <form class="pad f rv" style="--d:2" id="fm" novalidate>
+    <div class="fin"><div><label for="fn">Full name</label><input id="fn" type="text" autocomplete="off"></div><div><label for="em">Email</label><input id="em" type="email" autocomplete="off"></div>
+    <fieldset><legend>What do you need?</legend><label class="check" for="n1"><input id="n1" type="checkbox">Commercial</label><label class="check" for="n2"><input id="n2" type="checkbox">UI or explainer</label><label class="check" for="n3"><input id="n3" type="checkbox">3D</label><label class="check" for="n4"><input id="n4" type="checkbox">Package</label></fieldset>
+    <button class="btn" type="submit">Send</button></div>
+    <div class="thanks" id="thanks" aria-live="polite"><span data-logo="96"></span><strong>THANK YOU</strong><p>[When to expect a reply.] This is a demo, so nothing was sent.</p></div>
+  </form>
+</section>
+</main>
+<footer class="pad"><span>Amigo Productions, Oceanside CA</span></footer>
+<div class="vsw" role="group" aria-label="Version"><span>Version</span><a id="vs-r" href="index.html">Reel</a><a id="vs-g" href="gallery.html">Gallery</a></div>
+<div class="dim" id="dim"></div>
+<script src="../shared/data.js?v=1795817556"></script>
+<script src="../shared/kit.js?v=1795817556"></script>
+<script src="../shared/logos.js?v=1795817556"></script>
+<script src="../shared/viewer.js?v=1795817556"></script>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],{clamp,easeIO,easeOut,back,still}=Kit;
+Kit.mountLogos();Kit.grain();Kit.tears();
+/* 1. arrive: the mark waves, ANIMATION rises letter by letter, the subline ticks on, the nav comes last */
+const word=$('#word');word.innerHTML=[...'ANIMATION'].map((c,i)=>`<span aria-hidden="true" style="--i:${i}">${c}</span>`).join('');
+(document.fonts?document.fonts.load('40px Oaxaca').catch(()=>{}):Promise.resolve()).then(()=>requestAnimationFrame(()=>{document.body.classList.add('go');if(NOPHOTO)setTimeout(()=>field.spell(),250)}));
+/* 2. the tear: the photo drifts up slower than the page and the torn edge stretches as it leaves */
+const hero=$('.hero'),bg=$('.hero .bg'),tear=$('.hero .tear');
+function peel(){const y=scrollY,h=hero.offsetHeight;if(y>h+80)return;const k=clamp(y/(h*.8));bg.style.transform=`translate3d(0,${(y*.3).toFixed(1)}px,0)`;tear.style.transform=`scaleY(${(1+k*1.7).toFixed(3)})`}
+/* 3 + 4. the field: wakes once with a ring of color from the reel, then answers the cursor */
+const HC=document.documentElement.classList,NOPHOTO=HC.contains('tilesword'),REELHERO=HC.contains('reelhero'),GAL=HC.contains('gal'),reel=$('#reel');
+/* gallery: the work sits right under the row of tiles, the client logos follow it; the reel version drops the three placeholder slots */
+if(GAL){const w=$('#work');$('#field').after(w);document.title='Amigo Animation · Gallery'}else $$('#pieces .gonly').forEach(e=>e.remove());
+{const f=/gallery\.html$/.test(location.pathname),r=$('#vs-r'),g=$('#vs-g');if(!f){r.href=location.pathname;g.href=location.pathname+'?view=gallery'}(GAL?g:r).classList.add('on');(GAL?g:r).setAttribute('aria-current','page')}
+const field=new Kit.Field($('#kit'),{slot:reel,sleep:true,seed:11,grid:w=>{const ph=w<760;if(GAL)return ph?{C:6,R:1,B:null}:{C:12,R:1,B:null};if(REELHERO)return ph?{C:6,R:3,B:null}:{C:12,R:2,B:null};if(!NOPHOTO)return ph?{C:6,R:6,B:{x:0,y:0,w:6,h:4}}:{C:12,R:5,B:{x:0,y:0,w:7,h:4}};
+  /* no-photo hero: ANIMATION is spelled in tiles above the reel (one row on desktop, two on a phone) */
+  const L={},put=(str,i,j)=>[...str].forEach((c,k)=>L[(i+k)+','+j]=c);if(ph){put('ANIMA',0,0);put('TION',1,1);return{C:6,R:8,B:{x:0,y:2,w:6,h:4},letters:L}}put('ANIMATION',1,0);return{C:12,R:6,B:{x:0,y:1,w:7,h:4},letters:L}}});
+Kit.once($('#field'),()=>setTimeout(()=>field.wake(),NOPHOTO?1500:HC.contains('wordwin')?1300:HC.contains('timeline')?3000:0),.34);
+/* the reel is the real one: muted and looping in its window, with sound once it is opened */
+const art=new Kit.Clip(reel.querySelector('canvas'),'reel',{preload:GAL?'none':'auto'}),rv=art.v;if(!GAL)art.play();
+/* exploration B: ANIMATION cut out of a field of kit shapes that never stops morphing. Grey at rest; Amigo color follows the cursor, and one pass of color runs through on load. */
+if(HC.contains('wordwin')){const wm=$('#wm'),x=wm.getContext('2d'),{RP,rr,mix,ease}=Kit,WORD='ANIMATION',KS=['disc','arch','q1','cap','q3','h1','q2','disc','q4'],
+  GR=[['#C4C0BA','#E4E1DC'],['#B4B0AA','#8D8983'],['#E4E1DC','#C4C0BA'],['#A8A39C','#D8D4CD'],['#D8D4CD','#A8A39C']],AM=[['#BA6441','#F3E9DA'],['#291F18','#BA6441'],['#F3E9DA','#291F18'],['#BB6C2A','#291F18'],['#8E4427','#F3E9DA']];
+  let W=0,H=0,S=1,fs=100,base=0,xs=[],cells=[],mx=-9e3,my=-9e3,start=0,seen=true,raf=0;const mk=document.createElement('canvas'),mx2=mk.getContext('2d');
+  function size(){const d=Math.min(2,devicePixelRatio||1),w=wm.clientWidth;if(!w)return;const gut=parseFloat(getComputedStyle($('.top')).paddingLeft)||16;x.font='100px Oaxaca,Impact,sans-serif';const tw=x.measureText(WORD).width;fs=(w-gut*2)/tw*100;
+    x.font=fs+'px Oaxaca,Impact,sans-serif';const m=x.measureText(WORD),asc=m.actualBoundingBoxAscent,desc=Math.max(0,m.actualBoundingBoxDescent),hc=asc+desc+fs*.04;xs=[...WORD].map((c,k)=>(gut+x.measureText(WORD.slice(0,k)).width)*d);wm.style.height=hc+'px';W=Math.round(w*d);H=Math.round(hc*d);wm.width=W;wm.height=H;
+    base=(fs*.02+asc)*d;fs*=d;const rows=w<760?2:3;S=H/rows;const cols=Math.ceil(W/S);cells=[];
+    for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const n=i*3+j*5;cells.push({i,j,a:KS[n%9],b:KS[(n+4)%9],g:GR[(i*2+j*3)%5],am:AM[(i+j*2)%5],c:0})}draw(performance.now())}
+  function draw(now){const t=now/1000,el=now-start;x.setTransform(1,0,0,1,0,0);x.globalCompositeOperation='source-over';x.clearRect(0,0,W,H);const sweep=el/700*8-2;
+    for(const q of cells){const X=q.i*S,Y=q.j*S,d=Math.hypot((q.i+.5)*S-mx,(q.j+.5)*S-my)/S,near=d<1.7?1:0,pass=Math.abs(q.i+q.j*.6-sweep*(cells.length/3/8))<1.3&&el<2600?1:0,tg=Math.max(near,pass);q.c+=(tg-q.c)*(tg>q.c?.2:.045);
+      const m=still?0:ease((()=>{const u=((t-(q.i+q.j)*.22)%3.4+3.4)%3.4/3.4;return(u<.5?u*2:2-u*2)*1.6-.3})()),A=RP[q.a],B=RP[q.b],p=A.map((v,k)=>Math.max(0,v+(B[k]-v)*m));
+      x.fillStyle=mix(q.g[0],q.am[0],q.c);x.fillRect(X-.5,Y-.5,S+1,S+1);x.fillStyle=mix(q.g[1],q.am[1],q.c);rr(x,p,X,Y,S);x.fill()}
+    /* keep only what falls inside the letters; each letter rises into place on load */
+    if(mk.width!==W||mk.height!==H){mk.width=W;mk.height=H}mx2.clearRect(0,0,W,H);mx2.font=fs+'px Oaxaca,Impact,sans-serif';mx2.textBaseline='alphabetic';mx2.fillStyle='#000';
+    [...WORD].forEach((c,k)=>{const r=still?1:Kit.easeOut((el-150-k*55)/750);if(r>0)mx2.fillText(c,xs[k],base+(1-r)*H*1.05)});
+    x.globalCompositeOperation='destination-in';x.drawImage(mk,0,0);x.globalCompositeOperation='source-over'}
+  function loop(now){raf=0;if(!seen)return;draw(now);if(!still)raf=requestAnimationFrame(loop)}
+  const P=e=>{const b=wm.getBoundingClientRect();mx=(e.clientX-b.left)*(W/b.width);my=(e.clientY-b.top)*(H/b.height)};wm.addEventListener('pointermove',P);wm.addEventListener('pointerdown',P);wm.addEventListener('pointerleave',()=>{mx=my=-9e3});
+  new IntersectionObserver(e=>{seen=e[0].isIntersecting;if(seen&&!raf)raf=requestAnimationFrame(loop)}).observe(wm);new ResizeObserver(size).observe(wm);
+  (document.fonts?document.fonts.load('40px Oaxaca').catch(()=>{}):Promise.resolve()).then(()=>{start=performance.now();size();if(!raf)raf=requestAnimationFrame(loop)})}
+/* exploration D: the header is an animation timeline. Each letter is a layer with its own keyframes: it drops in, squashes, bounces and settles.
+   The page plays it once on load; after that the cursor is the playhead, so a visitor scrubs the animation back and forth themselves. */
+if(HC.contains('timeline')){const tl=$('#tl'),x=tl.getContext('2d'),WORD='ANIMATION',N=WORD.length,STEP=.062,DUR=.44,FR=48,{clamp,mix}=Kit;
+  let W=0,H=0,d=1,gut=40,fs=100,base=0,xs=[],ws=[],stageH=0,rowH=12,rulerY=0,T=still?1:0,target=1,auto=!still,autoAt=0,over=false,seen=true,raf=0;
+  /* one letter's pose at local time u: off above, falling, first bounce, second bounce, rest. Returns [y as a share of the drop, squash] */
+  function pose(u){if(u<=0)return[-1,0,0];if(u>=1)return[0,0,1];const a=.42,b=.74,c=.92;
+    if(u<a){const q=u/a;return[-(1-q*q),-.22*q,.5]}                                   /* fall: speeds up, stretches */
+    if(u<b){const q=(u-a)/(b-a),h=4*q*(1-q);return[-.2*h,.34*Math.max(0,1-q*5)-.08*h,.5]} /* land: squash, then a bounce */
+    if(u<c){const q=(u-b)/(c-b),h=4*q*(1-q);return[-.06*h,.16*Math.max(0,1-q*4),.8]}
+    const q=(u-c)/(1-c);return[0,.06*(1-q),1]}
+  function size(){d=Math.min(2,devicePixelRatio||1);const w=tl.clientWidth;if(!w)return;gut=parseFloat(getComputedStyle($('.top')).paddingLeft)||16;x.textBaseline='alphabetic';x.textAlign='left';x.font='100px Oaxaca,Impact,sans-serif';const tw=x.measureText(WORD).width;let f=(w-gut*2)/tw*100;
+    x.font=f+'px Oaxaca,Impact,sans-serif';const m=x.measureText(WORD),asc=m.actualBoundingBoxAscent;xs=[...WORD].map((c,k)=>(gut+x.measureText(WORD.slice(0,k)).width+x.measureText(c).width/2)*d);
+    rowH=w<760?9:15;const stage=asc*1.22,lanes=rowH*N+34+(w<760?16:26);tl.style.height=(stage+lanes)+'px';W=Math.round(w*d);H=Math.round((stage+lanes)*d);tl.width=W;tl.height=H;fs=f*d;base=(stage-asc*.04)*d;stageH=stage*d;rulerY=stageH+(w<760?16:26)*d;rowH*=d;gut*=d;draw()}
+  function draw(){x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,W,H);const x0=gut,tw=W-gut*2,px=x0+T*tw,drop=stageH*1.05;
+    /* stage: a floor line, onion-skin ghosts, then the letters */
+    x.fillStyle='#3A3836';x.fillRect(x0,base+2*d,tw,1.5*d);x.textAlign='center';x.textBaseline='alphabetic';x.font=fs+'px Oaxaca,Impact,sans-serif';
+    for(const g of [[.05,.07],[.025,.13],[0,1]]){for(let k=0;k<N;k++){const u=(T-g[0]-k*STEP)/DUR,[y,sq,ph]=pose(u);if(u<=0||(g[0]&&u>=1))continue;const moving=u<1,sy=1-sq,sx=1+sq*.55;
+        x.save();x.globalAlpha=g[1];x.translate(xs[k],base+y*drop);x.scale(sx,sy);x.fillStyle=g[0]?'#F1EFEB':moving?mix('#BA6441','#F1EFEB',clamp((u-.8)/.2)):'#F1EFEB';x.fillText(WORD[k],0,0);x.restore()}}
+    /* ruler */
+    x.globalAlpha=1;x.font=`${11*d}px ElCamino,"Trebuchet MS",sans-serif`;x.textAlign='left';x.textBaseline='bottom';
+    for(let f=0;f<=FR;f++){const X=x0+f/FR*tw,big=f%12===0;x.fillStyle=big?'#8D8983':'#4A4845';x.fillRect(X,rulerY-(big?9:4)*d,1*d,(big?9:4)*d);if(big&&f<FR){x.fillStyle='#8D8983';x.fillText(f+'f',X+5*d,rulerY-1*d)}}
+    x.fillStyle='#3A3836';x.fillRect(x0,rulerY,tw,1*d);
+    /* one lane per letter: a bar for its move, diamonds for its keys. Keys the playhead has passed light up. */
+    x.textBaseline='middle';x.textAlign='right';for(let k=0;k<N;k++){const s=k*STEP,y=rulerY+10*d+k*rowH+rowH/2,bx=x0+s*tw,bw=DUR*tw,live=T>s&&T<s+DUR;
+      x.fillStyle=live?'#55524E':'#2B2A28';x.beginPath();x.roundRect(bx,y-rowH*.3,bw,rowH*.6,rowH*.3);x.fill();
+      x.fillStyle=live?'#F1EFEB':'#6B6864';x.fillText(WORD[k],bx-7*d,y+1*d);
+      for(const kf of [0,.42,.74,.92,1]){const X=bx+kf*bw,r=rowH*.3,on=T>=s+kf*DUR;x.fillStyle=on?'#BA6441':'#8D8983';x.beginPath();x.moveTo(X,y-r);x.lineTo(X+r,y);x.lineTo(X,y+r);x.lineTo(X-r,y);x.closePath();x.fill()}}
+    /* playhead + timecode */
+    const top=rulerY-16*d,bot=rulerY+10*d+N*rowH+4*d;x.fillStyle='#BA6441';x.fillRect(px-1*d,top,2*d,bot-top);x.beginPath();x.moveTo(px-7*d,top-9*d);x.lineTo(px+7*d,top-9*d);x.lineTo(px+7*d,top-2*d);x.lineTo(px,top+5*d);x.lineTo(px-7*d,top-2*d);x.closePath();x.fill();
+    const fr=Math.round(T*FR),tc='00:0'+Math.floor(fr/24)+':'+String(fr%24).padStart(2,'0');x.textAlign=px>W-gut-90*d?'right':'left';x.textBaseline='top';x.fillStyle='#F3E9DA';x.font=`${12*d}px ElCamino,"Trebuchet MS",sans-serif`;x.fillText(tc,px+(x.textAlign==='right'?-8:8)*d,bot-11*d)}
+  function loop(now){raf=0;if(!seen)return;if(auto){T=Math.min(1,(now-autoAt)/2600);if(T>=1)auto=false}else{const g=over?target:1;T+=(g-T)*(over?.3:.07);if(Math.abs(g-T)<.0006)T=g}draw();if(auto||over||T!==1)raf=requestAnimationFrame(loop)}
+  const kick=()=>{if(!raf&&!still)raf=requestAnimationFrame(loop)};
+  const P=e=>{if(auto)return;const b=tl.getBoundingClientRect();over=true;target=clamp(((e.clientX-b.left)*d-gut)/(W-gut*2));kick()};
+  tl.addEventListener('pointermove',P);tl.addEventListener('pointerdown',P);const out=()=>{over=false;kick()};tl.addEventListener('pointerleave',out);tl.addEventListener('pointercancel',out);tl.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse')out()});
+  new IntersectionObserver(e=>{seen=e[0].isIntersecting;if(seen)kick()}).observe(tl);new ResizeObserver(size).observe(tl);
+  (document.fonts?Promise.all([document.fonts.load('40px Oaxaca'),document.fonts.load('12px ElCamino')]).catch(()=>{}):Promise.resolve()).then(()=>{size();autoAt=performance.now()+350;kick()})}
+/* 5. watch the reel: the same window grows to fill the screen, the tiles slide outward, the page dims */
+const dim=$('#dim');let open=false,keep='',busy=false;
+const full=()=>({left:'0px',top:'0px',width:innerWidth+'px',height:innerHeight+'px'});
+if(REELHERO){hero.insertBefore(reel,hero.firstChild);hero.addEventListener('click',e=>{if(!e.target.closest('a,button'))openReel()})}
+function slotRect(){if(REELHERO){const b=hero.getBoundingClientRect();return{left:b.left+'px',top:b.top+'px',width:b.width+'px',height:b.height+'px'}}const b=$('#kit').getBoundingClientRect(),B=field.B,C=field.C,R=field.R;return{left:b.left+B.x/C*b.width+'px',top:b.top+B.y/R*b.height+'px',width:B.w/C*b.width+'px',height:B.h/R*b.height+'px'}}
+function openReel(){if(open||busy)return;open=busy=true;const from=slotRect();keep=reel.style.cssText;document.body.appendChild(reel);reel.classList.add('open');Object.assign(reel.style,full());
+  field.spreadTo=1;dim.classList.add('on');document.documentElement.style.overflow='hidden';reel.setAttribute('aria-label','Reel, playing');
+  const a=reel.animate([from,full()],{duration:still?1:620,easing:'cubic-bezier(.5,0,.15,1)'});rv.muted=false;rv.play().catch(()=>{});a.onfinish=()=>{busy=false;reel.querySelector('.x').focus()}}
+function closeReel(){if(!open||busy)return;busy=true;rv.muted=true;const to=slotRect();field.spreadTo=0;dim.classList.remove('on');
+  const a=reel.animate([full(),to],{duration:still?1:520,easing:'cubic-bezier(.5,0,.15,1)'});a.onfinish=()=>{reel.classList.remove('open');reel.style.cssText=keep;if(REELHERO)hero.insertBefore(reel,hero.firstChild);else $('#field').appendChild(reel);document.documentElement.style.overflow='';open=busy=false;reel.setAttribute('aria-label','Watch the reel');reel.focus({preventScroll:true})}}
+reel.addEventListener('click',e=>{if(e.target.closest('.x')){closeReel();return}if(!open)openReel()});
+reel.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target===reel&&!open){e.preventDefault();openReel()}});
+dim.addEventListener('click',closeReel);addEventListener('keydown',e=>{if(e.key==='Escape')closeReel()});
+addEventListener('resize',()=>requestAnimationFrame(()=>{if(open)Object.assign(reel.style,full());else keep=''}));
+/* client logos: one-color vectors, sized by shape so wide wordmarks and square marks carry the same weight */
+$$('#clients div').forEach(d=>{const v=AM_LOGOS[d.dataset.k];if(!v)return;d.setAttribute('role','img');d.setAttribute('aria-label',v.name);d.style.setProperty('--lw',Math.pow(v.w/v.h,.62).toFixed(3));d.innerHTML=`<svg viewBox="0 0 ${v.w} ${v.h}" aria-hidden="true"><g transform="${v.t}" fill="currentColor"><path d="${v.d}"></path></g></svg>`});
+/* 6. the line arrives word by word; the client grid takes one diagonal color pass */
+Kit.words($('#line'));setTimeout(()=>$('#line').classList.add('in'),still?0:1150);
+/* phone: the logos run as one slow marquee row (B's 11-26 mobile pass); the second set is a hidden copy for the loop */
+$$('#clients div').forEach(d=>{const c=d.cloneNode(true);c.classList.add('dup');c.setAttribute('aria-hidden','true');c.setAttribute('role','presentation');c.setAttribute('aria-label','');$('#clients').appendChild(c)});
+Kit.once($('#clients'),el=>{const cols=getComputedStyle(el).gridTemplateColumns.split(' ').length;[...el.children].forEach((d,i)=>d.style.setProperty('--k',(i%cols)+Math.floor(i/cols)));el.classList.add('pass');setTimeout(()=>el.classList.remove('pass'),3200)},.35);
+/* 7. selected work: a wall of kit tiles covers each piece; when the piece is on screen a wave of its color runs
+   through the wall, the tiles slide out of their squares and the work plays underneath */
+/* tile colors: black, white and greys only, like the tile field up top (Austin, 11-25: the mixed palette was wrong;
+   match the site scheme or go B&W). [tile, shape] */
+const MIX=[['#2B2A28','#8D8983'],['#C4C0BA','#2B2A28'],['#3A3836','#C4C0BA'],['#F1EFEB','#3A3836'],['#8D8983','#1E1D1C'],['#1E1D1C','#C4C0BA'],['#55524E','#F1EFEB'],['#C4C0BA','#55524E'],['#2B2A28','#F1EFEB']];
+const pieces=$$('#pieces .piece').map((el,i)=>{const d=el.dataset,a=Kit.media(el.querySelector('canvas'),d.clip?{clip:d.clip,title:d.title,credit:d.credit}:{k:d.k,p:0});return{el,a,i,p:0,wall:null}});
+function wall(P){if(still)return;const b=P.el.getBoundingClientRect(),C=Math.max(4,Math.round(b.width/Math.max(150,Math.min(210,innerWidth/8.5)))),R=Math.ceil(b.height/(b.width/C)-.02);
+  if(P.wall)P.wall.remove();const w=document.createElement('span');w.className='wall';w.setAttribute('aria-hidden','true');w.style.setProperty('--c',C);w.style.setProperty('--t',(b.width/C).toFixed(2)+'px');
+  /* the wave starts in a different corner on each piece; a tile leaves along the wave, sideways or up and down in turn */
+  const fx=P.i%2,fy=P.i%3===2;let s='',m;for(let r=0;r<R;r++)for(let c=0;c<C;c++){const cc=fx?C-1-c:c,rr=fy?R-1-r:r,n=cc+rr,hz=(c+r)%2===0,sx=fx?-1:1,sy=fy?-1:1;
+    s+=`<span><b class="k${(c*7+r*3+P.i)%6}" style="--n:${n};--tx:${hz?sx*101:0}%;--ty:${hz?0:sy*101}%;--pc:${(m=MIX[(c*5+r*7+P.i*3+((c*r)%3))%MIX.length])[0]};--pi:${m[1]}"></b></span>`}
+  w.innerHTML=s;P.el.appendChild(w);P.wall=w;P.last=(C+R)*55+1000}
+function openPiece(P){if(P.p)return;P.p=1;P.el.classList.add('open');P.a.play();if(P.wall)setTimeout(()=>{if(P.wall){P.wall.remove();P.wall=null}},P.last+200)}
+pieces.forEach(P=>{wall(P);if(still){openPiece(P);return}Kit.once(P.el,()=>setTimeout(()=>openPiece(P),(P.el.getBoundingClientRect().left/innerWidth)*260),.38)});
+function work(){}
+/* tap or click any piece: the viewer opens it big with sound, previous / next, swipe, Esc */
+const LIST=pieces.map(P=>P.el.dataset.clip?{clip:P.el.dataset.clip,title:P.el.dataset.title,credit:P.el.dataset.credit}:{k:P.el.dataset.k,p:0});
+pieces.forEach((P,i)=>{P.el.addEventListener('click',e=>{e.preventDefault();Viewer.open(LIST,i,P.el)});P.el.addEventListener('keydown',e=>{if(e.key===' '){e.preventDefault();Viewer.open(LIST,i,P.el)}})});
+/* 8. what we make: the four shapes morph once, left to right */
+Kit.once($('#doorrow'),el=>{if(still)return;[...el.children].forEach((d,i)=>{setTimeout(()=>d.classList.add('tick'),200+i*190);setTimeout(()=>d.classList.remove('tick'),900+i*190)})},.5);
+/* 9. the wave: rises, breaks over the torn edge, settles into the ocean */
+const bw=$('#bigwave'),wg=bw.getContext('2d');let wm=0,wr=0;
+const tearT=$('#start .tear');
+function drawWave(){const d=Math.min(2,devicePixelRatio||1),w=Math.round(bw.clientWidth*d),h=Math.round(bw.clientHeight*d);if(!w)return;if(bw.width!==w||bw.height!==h){bw.width=w;bw.height=h}wg.setTransform(1,0,0,1,0,0);wg.clearRect(0,0,w,h);
+  /* the wave grows out of the torn edge: everything is clipped by the same line the tear was drawn from */
+  const tH=tearT.clientHeight*d,cw=$('#start').clientWidth,x0=bw.offsetLeft,L=tearT._a||[];wg.save();wg.beginPath();wg.moveTo(0,0);wg.lineTo(w,0);
+  for(let i=L.length-1;i>=0;i--){const X=(L[i][0]*cw-x0)*d;if(X<-40||X>w+40)continue;wg.lineTo(X,h-tH+(1-L[i][1])*tH+1)}wg.closePath();wg.clip();
+  /* a full curl: the face climbs from the waterline, the lip goes over the top and tucks back into a barrel of water */
+  const sea=h-tH*.3,R=h*.43*(.25+.75*wr),r=R*.52,cx=w*.6,cy=sea-R*1.02,A=Math.PI+(Math.PI*1.36)*clamp(wm),k=Kit.ease(wm);
+  wg.globalAlpha=k;wg.fillStyle='#143F4E';wg.beginPath();wg.arc(cx,cy,r+1,0,7);wg.fill();wg.fillRect(cx-r-1,cy,r*2+2,sea-cy+tH);wg.globalAlpha=1;
+  wg.fillStyle='#F7F0E4';wg.beginPath();wg.moveTo(-10,sea+tH);wg.lineTo(-10,sea);wg.bezierCurveTo(w*.3,sea,cx-R,cy+R*1.15,cx-R,cy);wg.arc(cx,cy,R,Math.PI,A);
+  wg.arc(cx+Math.cos(A)*(R+r)/2,cy+Math.sin(A)*(R+r)/2,(R-r)/2,A,A+Math.PI);wg.arc(cx,cy,r,A,Math.PI,true);wg.lineTo(cx-r,sea+tH);wg.closePath();wg.fill();wg.restore()}
+Kit.once($('#start'),()=>{if(still){wm=wr=1;drawWave();return}const t0=performance.now();(function f(n){const t=(n-t0)/1000;wr=easeOut(t/.7);wm=easeIO((t-.25)/1.05);drawWave();if(t<1.4)requestAnimationFrame(f);else{wm=wr=1;drawWave()}})(t0)},.18);
+new ResizeObserver(drawWave).observe(bw);
+/* 10. sent */
+$('#fm').addEventListener('submit',e=>{e.preventDefault();$('#fm').classList.add('sent')});
+Kit.fixG();Kit.reveals();
+let tick=false;function onScroll(){if(tick)return;tick=true;requestAnimationFrame(()=>{tick=false;peel();work()})}
+addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',()=>{pieces.forEach(P=>{if(!P.p)wall(P)});onScroll()});peel();work();
+</script>
+<script>/* ?v=full (the specialty pages with their signature sections) carries over to those pages */if(new URLSearchParams(location.search).get("v")==="full")document.querySelectorAll("a[href]").forEach(a=>{const u=a.getAttribute("href");if(/(commercials|ui|3d|packages)(\/index\.html)?$/.test(u))a.setAttribute("href",u+"?v=full")})</script>
+<script src="../shared/nav.js?v=1795817556"></script>
+</body>
+</html>

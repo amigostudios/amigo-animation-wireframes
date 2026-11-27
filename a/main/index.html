@@ -11,8 +11,8 @@
 <meta name="robots" content="noindex">
 <title>Amigo Animation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="../shared/site.css?v=1795800869">
-<script>/* prototype variant: main/index.html?hero=none drops the studio photo and the torn edge */(function(){var h=new URLSearchParams(location.search).get("hero"),c=document.documentElement.classList;/* none = A, wordmark spelled in tiles; b = B, wordmark as a window onto the kit */if(h==="none")c.add("nophoto","tilesword");if(h==="b")c.add("nophoto","wordwin");/* c = C, the reel itself is the hero */if(h==="c")c.add("reelhero");/* d = D, the header is a timeline you scrub */if(h==="d")c.add("nophoto","timeline")})()</script>
+<link rel="stylesheet" href="../shared/site.css?v=1795817556">
+<script>/* prototype variant: main/index.html?hero=none drops the studio photo and the torn edge */(function(){var h=new URLSearchParams(location.search).get("hero"),c=document.documentElement.classList;/* none = A, wordmark spelled in tiles; b = B, wordmark as a window onto the kit */if(h==="none")c.add("nophoto","tilesword");if(h==="b")c.add("nophoto","wordwin");/* c = C, the reel itself is the hero */if(h==="c")c.add("reelhero");/* d = D, the header is a timeline you scrub */if(h==="d")c.add("nophoto","timeline");/* Gallery version (11-27): no reel, the work grid is the hero. main/gallery.html or ?view=gallery */if(/gallery\.html$/.test(location.pathname)||new URLSearchParams(location.search).get("view")==="gallery")c.add("gal")})()</script>
 <style>
 /* hero: studio photo that peels away on scroll */
 .hero{position:relative;background:#2A2420;isolation:isolate;overflow:hidden}
@@ -191,6 +191,31 @@ footer{justify-content:flex-start}
 .cwrap .clients div{width:118px;min-height:84px;border-bottom:0;flex:none}
 @keyframes mq{to{transform:translateX(-50%)}}
 }
+
+/* ---------- Gallery version (11-27, Austin: build the tile design's gallery too, to compare with the reel version) ----------
+   Same idea as option B's gallery: no reel. Header (word, place line, pitch), a single row of tiles, then the work
+   grid as the hero: 3 across, first piece 2x2, every piece plays once it has opened, labels over the picture. */
+.gonly{display:none}
+.gal .gonly{display:block}
+.gal #reel{display:none}
+.gal #work .head{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);padding:0}
+.gal #work{border-top:2px solid var(--ground)}
+@media(min-width:761px){
+.gal #pieces{grid-template-columns:repeat(3,minmax(0,1fr))}
+.gal #pieces .piece{grid-column:auto;aspect-ratio:16/10}
+.gal #pieces .piece:first-child{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
+}
+@media(max-width:760px){
+.gal #pieces .piece:last-child{grid-column:span 6;aspect-ratio:1/1}
+.gal #pieces .piece:last-child .lab{font-size:12.5px;line-height:1.3;padding:7px 10px;max-width:calc(100% - 44px)}
+.gal #pieces .piece:last-child .pl{width:32px;height:32px;right:8px;bottom:8px}.gal #pieces .piece:last-child .pl svg{width:14px}
+}
+/* review switch between the two versions */
+.vsw{position:fixed;left:14px;bottom:14px;z-index:45;display:flex;align-items:center;gap:4px;padding:5px;border-radius:999px;background:rgba(22,21,20,.92);box-shadow:0 6px 24px rgba(0,0,0,.4);font-size:13px;font-weight:500}
+.vsw span{padding:0 8px 0 10px;color:var(--dim)}
+.vsw a{padding:7px 13px;border-radius:999px;text-decoration:none;color:var(--ink);transition:background .2s,color .2s}
+.vsw a:hover{background:#34322F}
+.vsw a.on{background:var(--cream);color:var(--night)}
 </style>
 </head>
 <body>
@@ -224,6 +249,9 @@ footer{justify-content:flex-start}
     <a class="piece p7" href="#work" role="button" aria-label="Watch Workcloud Timekeeping, Zebra" data-shape="cap" data-clip="zebra_timekeeping" data-title="Workcloud Timekeeping" data-credit="Zebra" style="--pc:#F3E9DA"><span class="sh"><canvas></canvas></span><span class="lab">Workcloud Timekeeping · Zebra</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
     <a class="piece p7" href="#work" role="button" aria-label="Watch Star Born, Jiffy Learning" data-shape="q3" data-clip="jiffy_starborn" data-title="Star Born" data-credit="Jiffy Learning" style="--pc:#8E4427"><span class="sh"><canvas></canvas></span><span class="lab">Star Born · Jiffy Learning</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
     <a class="piece p5" href="#work" role="button" aria-label="Watch Workcloud Scheduling, Zebra" data-shape="h1" data-clip="zebra_scheduling" data-title="Workcloud Scheduling" data-credit="Zebra" style="--pc:#F3E9DA"><span class="sh"><canvas></canvas></span><span class="lab">Workcloud Scheduling · Zebra</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
+    <a class="piece p5 gonly" href="#work" role="button" aria-label="Watch this piece" data-shape="disc" data-k="desert" style="--pc:#BA6441"><span class="sh"><canvas></canvas></span><span class="lab">[Piece] · [Credit]</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
+    <a class="piece p5 gonly" href="#work" role="button" aria-label="Watch this piece" data-shape="disc" data-k="wave" style="--pc:#F3E9DA"><span class="sh"><canvas></canvas></span><span class="lab">[Piece] · [Credit]</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
+    <a class="piece p5 gonly" href="#work" role="button" aria-label="Watch this piece" data-shape="disc" data-k="orb" style="--pc:#BB6C2A"><span class="sh"><canvas></canvas></span><span class="lab">[Piece] · [Credit]</span><span class="pl" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M5 2l12 8-12 8z"></path></svg></span></a>
   </div></section>
 <section id="doors" aria-labelledby="d-h"><div class="head pad"><h2 id="d-h" class="rv">What we make</h2></div>
   <div class="doors" id="doorrow">
@@ -248,11 +276,12 @@ footer{justify-content:flex-start}
 </section>
 </main>
 <footer class="pad"><span>Amigo Productions, Oceanside CA</span></footer>
+<div class="vsw" role="group" aria-label="Version"><span>Version</span><a id="vs-r" href="index.html">Reel</a><a id="vs-g" href="gallery.html">Gallery</a></div>
 <div class="dim" id="dim"></div>
-<script src="../shared/data.js?v=1795800869"></script>
-<script src="../shared/kit.js?v=1795800869"></script>
-<script src="../shared/logos.js?v=1795800869"></script>
-<script src="../shared/viewer.js?v=1795800869"></script>
+<script src="../shared/data.js?v=1795817556"></script>
+<script src="../shared/kit.js?v=1795817556"></script>
+<script src="../shared/logos.js?v=1795817556"></script>
+<script src="../shared/viewer.js?v=1795817556"></script>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],{clamp,easeIO,easeOut,back,still}=Kit;
 Kit.mountLogos();Kit.grain();Kit.tears();
@@ -263,12 +292,16 @@ const word=$('#word');word.innerHTML=[...'ANIMATION'].map((c,i)=>`<span aria-hid
 const hero=$('.hero'),bg=$('.hero .bg'),tear=$('.hero .tear');
 function peel(){const y=scrollY,h=hero.offsetHeight;if(y>h+80)return;const k=clamp(y/(h*.8));bg.style.transform=`translate3d(0,${(y*.3).toFixed(1)}px,0)`;tear.style.transform=`scaleY(${(1+k*1.7).toFixed(3)})`}
 /* 3 + 4. the field: wakes once with a ring of color from the reel, then answers the cursor */
-const HC=document.documentElement.classList,NOPHOTO=HC.contains('tilesword'),REELHERO=HC.contains('reelhero'),reel=$('#reel'),field=new Kit.Field($('#kit'),{slot:reel,sleep:true,seed:11,grid:w=>{const ph=w<760;if(REELHERO)return ph?{C:6,R:3,B:null}:{C:12,R:2,B:null};if(!NOPHOTO)return ph?{C:6,R:6,B:{x:0,y:0,w:6,h:4}}:{C:12,R:5,B:{x:0,y:0,w:7,h:4}};
+const HC=document.documentElement.classList,NOPHOTO=HC.contains('tilesword'),REELHERO=HC.contains('reelhero'),GAL=HC.contains('gal'),reel=$('#reel');
+/* gallery: the work sits right under the row of tiles, the client logos follow it; the reel version drops the three placeholder slots */
+if(GAL){const w=$('#work');$('#field').after(w);document.title='Amigo Animation · Gallery'}else $$('#pieces .gonly').forEach(e=>e.remove());
+{const f=/gallery\.html$/.test(location.pathname),r=$('#vs-r'),g=$('#vs-g');if(!f){r.href=location.pathname;g.href=location.pathname+'?view=gallery'}(GAL?g:r).classList.add('on');(GAL?g:r).setAttribute('aria-current','page')}
+const field=new Kit.Field($('#kit'),{slot:reel,sleep:true,seed:11,grid:w=>{const ph=w<760;if(GAL)return ph?{C:6,R:1,B:null}:{C:12,R:1,B:null};if(REELHERO)return ph?{C:6,R:3,B:null}:{C:12,R:2,B:null};if(!NOPHOTO)return ph?{C:6,R:6,B:{x:0,y:0,w:6,h:4}}:{C:12,R:5,B:{x:0,y:0,w:7,h:4}};
   /* no-photo hero: ANIMATION is spelled in tiles above the reel (one row on desktop, two on a phone) */
   const L={},put=(str,i,j)=>[...str].forEach((c,k)=>L[(i+k)+','+j]=c);if(ph){put('ANIMA',0,0);put('TION',1,1);return{C:6,R:8,B:{x:0,y:2,w:6,h:4},letters:L}}put('ANIMATION',1,0);return{C:12,R:6,B:{x:0,y:1,w:7,h:4},letters:L}}});
 Kit.once($('#field'),()=>setTimeout(()=>field.wake(),NOPHOTO?1500:HC.contains('wordwin')?1300:HC.contains('timeline')?3000:0),.34);
 /* the reel is the real one: muted and looping in its window, with sound once it is opened */
-const art=new Kit.Clip(reel.querySelector('canvas'),'reel',{preload:'auto'}),rv=art.v;art.play();
+const art=new Kit.Clip(reel.querySelector('canvas'),'reel',{preload:GAL?'none':'auto'}),rv=art.v;if(!GAL)art.play();
 /* exploration B: ANIMATION cut out of a field of kit shapes that never stops morphing. Grey at rest; Amigo color follows the cursor, and one pass of color runs through on load. */
 if(HC.contains('wordwin')){const wm=$('#wm'),x=wm.getContext('2d'),{RP,rr,mix,ease}=Kit,WORD='ANIMATION',KS=['disc','arch','q1','cap','q3','h1','q2','disc','q4'],
   GR=[['#C4C0BA','#E4E1DC'],['#B4B0AA','#8D8983'],['#E4E1DC','#C4C0BA'],['#A8A39C','#D8D4CD'],['#D8D4CD','#A8A39C']],AM=[['#BA6441','#F3E9DA'],['#291F18','#BA6441'],['#F3E9DA','#291F18'],['#BB6C2A','#291F18'],['#8E4427','#F3E9DA']];
@@ -351,7 +384,7 @@ Kit.once($('#clients'),el=>{const cols=getComputedStyle(el).gridTemplateColumns.
 /* tile colors: black, white and greys only, like the tile field up top (Austin, 11-25: the mixed palette was wrong;
    match the site scheme or go B&W). [tile, shape] */
 const MIX=[['#2B2A28','#8D8983'],['#C4C0BA','#2B2A28'],['#3A3836','#C4C0BA'],['#F1EFEB','#3A3836'],['#8D8983','#1E1D1C'],['#1E1D1C','#C4C0BA'],['#55524E','#F1EFEB'],['#C4C0BA','#55524E'],['#2B2A28','#F1EFEB']];
-const pieces=$$('#pieces .piece').map((el,i)=>{const d=el.dataset,a=Kit.media(el.querySelector('canvas'),{clip:d.clip,title:d.title,credit:d.credit});return{el,a,i,p:0,wall:null}});
+const pieces=$$('#pieces .piece').map((el,i)=>{const d=el.dataset,a=Kit.media(el.querySelector('canvas'),d.clip?{clip:d.clip,title:d.title,credit:d.credit}:{k:d.k,p:0});return{el,a,i,p:0,wall:null}});
 function wall(P){if(still)return;const b=P.el.getBoundingClientRect(),C=Math.max(4,Math.round(b.width/Math.max(150,Math.min(210,innerWidth/8.5)))),R=Math.ceil(b.height/(b.width/C)-.02);
   if(P.wall)P.wall.remove();const w=document.createElement('span');w.className='wall';w.setAttribute('aria-hidden','true');w.style.setProperty('--c',C);w.style.setProperty('--t',(b.width/C).toFixed(2)+'px');
   /* the wave starts in a different corner on each piece; a tile leaves along the wave, sideways or up and down in turn */
@@ -362,7 +395,7 @@ function openPiece(P){if(P.p)return;P.p=1;P.el.classList.add('open');P.a.play();
 pieces.forEach(P=>{wall(P);if(still){openPiece(P);return}Kit.once(P.el,()=>setTimeout(()=>openPiece(P),(P.el.getBoundingClientRect().left/innerWidth)*260),.38)});
 function work(){}
 /* tap or click any piece: the viewer opens it big with sound, previous / next, swipe, Esc */
-const LIST=pieces.map(P=>({clip:P.el.dataset.clip,title:P.el.dataset.title,credit:P.el.dataset.credit}));
+const LIST=pieces.map(P=>P.el.dataset.clip?{clip:P.el.dataset.clip,title:P.el.dataset.title,credit:P.el.dataset.credit}:{k:P.el.dataset.k,p:0});
 pieces.forEach((P,i)=>{P.el.addEventListener('click',e=>{e.preventDefault();Viewer.open(LIST,i,P.el)});P.el.addEventListener('keydown',e=>{if(e.key===' '){e.preventDefault();Viewer.open(LIST,i,P.el)}})});
 /* 8. what we make: the four shapes morph once, left to right */
 Kit.once($('#doorrow'),el=>{if(still)return;[...el.children].forEach((d,i)=>{setTimeout(()=>d.classList.add('tick'),200+i*190);setTimeout(()=>d.classList.remove('tick'),900+i*190)})},.5);
@@ -387,6 +420,6 @@ let tick=false;function onScroll(){if(tick)return;tick=true;requestAnimationFram
 addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',()=>{pieces.forEach(P=>{if(!P.p)wall(P)});onScroll()});peel();work();
 </script>
 <script>/* ?v=full (the specialty pages with their signature sections) carries over to those pages */if(new URLSearchParams(location.search).get("v")==="full")document.querySelectorAll("a[href]").forEach(a=>{const u=a.getAttribute("href");if(/(commercials|ui|3d|packages)(\/index\.html)?$/.test(u))a.setAttribute("href",u+"?v=full")})</script>
-<script src="../shared/nav.js?v=1795800869"></script>
+<script src="../shared/nav.js?v=1795817556"></script>
 </body>
 </html>
